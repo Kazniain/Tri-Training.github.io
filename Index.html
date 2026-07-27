@@ -1,0 +1,1712 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Triathlon Training Tracker (v7)</title>
+<style>
+:root{--bg:#f4f7f8;--card:#fff;--text:#172126;--muted:#627078;--border:#d8e0e4;--accent:#126e82;--soft:#e4f2f5;--good:#287a4d;--bad:#a63d40;--warn:#9a6110}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:1240px;margin:auto;padding:20px}.hero{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:end;margin-bottom:18px}h1,h2,h3{margin:0 0 8px}h1{font-size:clamp(1.8rem,4vw,3rem)}.muted{color:var(--muted)}.small{font-size:.84rem}.grid{display:grid;gap:14px}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px}.metric strong{display:block;font-size:1.8rem;margin:4px 0}label{display:block;font-size:.92rem}input,select,textarea{width:100%;margin-top:6px;border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff;color:var(--text)}textarea{resize:vertical}.primary,.secondary{border-radius:10px;padding:10px 14px}.primary{background:var(--accent);color:#fff;border:0}.secondary{background:#fff;color:var(--text);border:1px solid var(--border)}.danger{color:var(--bad)}.week-note,.callout{background:var(--soft);border-radius:12px;padding:12px;margin:14px 0}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.day{border:1px solid var(--border);background:#fff;border-radius:13px;padding:10px;text-align:left;min-height:112px}.day.active{outline:2px solid var(--accent);background:var(--soft)}.day.done{border-color:var(--good)}.pill{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid var(--border);font-size:.78rem}.planned{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}.planned>div{border:1px solid var(--border);border-radius:12px;padding:12px}.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.activity{border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px}.activity-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.track{height:10px;background:var(--soft);border-radius:999px;overflow:hidden;margin-top:5px}.fill{height:100%;background:var(--accent)}svg{width:100%;height:auto;display:block}.chart-grid{stroke:var(--border);stroke-width:1}.chart-label{fill:var(--muted);font-size:11px}.planned-bar{fill:var(--soft);stroke:var(--border)}.actual-bar{fill:var(--accent)}.line{fill:none;stroke:var(--accent);stroke-width:3}.target-line{fill:none;stroke:var(--warn);stroke-width:2;stroke-dasharray:7 5}.dot{fill:var(--accent)}.target-dot{fill:var(--warn)}.status{min-height:24px;color:var(--good);margin-top:8px}.nutrition strong{font-size:1.35rem;display:block}.warning{color:var(--warn)}footer{padding:24px 0;color:var(--muted);font-size:.85rem}.report-preview{margin-top:16px}.report-shell{max-width:720px;margin:auto;background:#102b35;color:#fff;border-radius:24px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.report-top{padding:24px;background:linear-gradient(135deg,#126e82,#193d4a)}.report-top h2{font-size:2rem;margin:3px 0}.report-kicker{font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;opacity:.8}.report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.18)}.report-stat{background:#173743;padding:16px;text-align:center}.report-stat b{display:block;font-size:1.55rem}.report-body{padding:20px;background:#f7fbfc;color:#172126}.report-bars{display:grid;gap:10px}.report-bar-head{display:flex;justify-content:space-between;font-size:.86rem}.report-bar-track{height:10px;background:#dbeaed;border-radius:999px;overflow:hidden}.report-bar-fill{height:100%;background:#126e82;border-radius:999px}.report-footer{padding:14px 20px;background:#e4f2f5;color:#34515a;font-size:.8rem}
+.hero-controls{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.day-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin-top:6px}
+.report-hero-row{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:center}
+.report-score{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#64d6c6 var(--score),rgba(255,255,255,.16) 0)}
+.report-score-inner{width:98px;height:98px;border-radius:50%;background:#173743;display:grid;place-items:center;text-align:center}
+.report-score-inner b{font-size:2rem;line-height:1}.report-score-inner span{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:.08em}
+.report-section{margin-top:18px}.report-section h3{font-size:1rem;text-transform:uppercase;letter-spacing:.08em;color:#126e82}
+.report-highlight{background:#e9f5f3;border-left:5px solid #2ba58f;padding:14px;border-radius:10px;margin-top:12px}
+.report-coach{background:#173743;color:#fff;padding:18px;border-radius:14px;margin-top:16px}
+.report-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.report-mini{background:#fff;border:1px solid #d8e0e4;border-radius:12px;padding:12px}.report-mini b{display:block;font-size:1.25rem}
+@media(max-width:600px){.report-hero-row{grid-template-columns:1fr}.report-score{margin:auto}.report-mini-grid{grid-template-columns:1fr}}.report-modal{display:none;position:fixed;inset:0;background:rgba(8,24,30,.72);z-index:30;padding:18px;overflow:auto}.report-modal.open{display:block}.report-dialog{max-width:980px;margin:20px auto;background:var(--bg);border-radius:20px;padding:18px}.report-toolbar{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap}.report-actions{display:flex;gap:8px;flex-wrap:wrap}.report-note{background:var(--soft);padding:12px;border-radius:12px;margin-top:12px}@media(max-width:900px){.metrics,.two,.three{grid-template-columns:repeat(2,minmax(0,1fr))}.calendar{grid-template-columns:repeat(4,minmax(0,1fr))}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.app{padding:12px}.metrics,.two,.three,.planned,.form-grid{grid-template-columns:1fr}.calendar{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-controls{align-items:stretch;width:100%}.hero-controls .actions{justify-content:stretch}.hero-controls .actions button{flex:1 1 auto}.report-grid{grid-template-columns:repeat(2,1fr)}}
+@media print{.actions,.backup{display:none!important}.card{break-inside:avoid}}
+input,select,textarea{font-size:16px}
+.confirm-modal{overflow-y:auto}
+.field-invalid{outline:2px solid var(--bad)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:#172126;color:#fff;padding:12px 16px;border-radius:12px;font-size:.9rem;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast-action{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;padding:5px 10px;font-size:.85rem}
+.confirm-modal{display:none;position:fixed;inset:0;background:rgba(8,24,30,.6);z-index:60;padding:18px;align-items:center;justify-content:center}
+.confirm-modal.open{display:flex}
+.confirm-dialog{background:var(--bg);border-radius:16px;padding:20px;max-width:420px;width:100%;box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.checkin-history{margin-top:14px;display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}
+.checkin-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:#fff;flex-wrap:wrap}
+.checkin-row .actions{margin-top:0}
+.danger-btn{background:var(--bad)!important;color:#fff!important;border:0!important}
+.session-guide{margin-top:14px;border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff}
+.session-guide summary{cursor:pointer;font-weight:600}
+.session-guide p{margin:8px 0}
+.session-guide ul{margin:6px 0;padding-left:20px}
+.exercise-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.exercise-card{border:1px solid var(--border);border-radius:10px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.exercise-card svg{color:var(--accent)}
+.meal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
+.meal-card{border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff}
+.meal-card h4{margin:0 0 2px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.meal-card .meal-name{font-weight:600;margin-bottom:4px}
+.meal-macros{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0;font-size:.82rem;color:var(--muted)}
+.meal-card details{margin-top:8px}
+.meal-card summary{cursor:pointer;font-size:.85rem;color:var(--accent)}
+.meal-card ul{margin:6px 0;padding-left:18px;font-size:.86rem}
+.meal-card ol{margin:6px 0;padding-left:18px;font-size:.86rem}
+.meal-card a{color:var(--accent);font-size:.82rem;display:inline-block;margin-top:6px}
+</style>
+</head>
+<body><main class="app">
+<header class="hero"><div><div class="muted" id="raceLine">Loading…</div><h1 id="appTitle">Project &lt;100</h1><p class="muted">Dated training, flexible activity logging, calorie estimates, nutrition guidance and shareable progress reports.</p></div><div class="hero-controls"><label>Training plan<select id="profileSelect"></select></label><div class="actions" style="margin-top:0"><button id="newProfileBtn" class="secondary" type="button">New plan</button><button id="editProfileBtn" class="secondary" type="button">Edit setup</button><button id="deleteProfileBtn" class="secondary danger" type="button">Delete plan</button></div><label>Training week<select id="weekSelect"></select></label></div></header>
+<div id="regenerateBar" class="card" style="margin-bottom:14px;display:none"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><p class="muted" style="margin:0">This plan was generated from your setup. Changing setup only affects <strong>future, not-yet-started</strong> weeks — logged history is kept.</p><button id="regenerateBtn" class="secondary" type="button">Regenerate future weeks</button></div></div>
+<section class="grid metrics"><div class="card metric"><span class="muted">Plan completion</span><strong id="completionValue">0%</strong><span id="completionDetail" class="muted"></span></div><div class="card metric"><span class="muted">Actual training</span><strong id="timeValue">0.0 h</strong><span id="activityDetail" class="muted"></span></div><div class="card metric"><span class="muted">Current weight</span><strong id="weightValue">76.0 kg</strong><span id="weightChange" class="muted">Target 71.5 kg</span></div><div class="card metric"><span class="muted">Race countdown</span><strong id="countdownValue">—</strong><span class="muted">to 1 November 2026</span></div></section>
+<section class="card" style="margin-top:14px"><h2>Calendar training plan</h2><div id="weekSummary" class="week-note"></div><div id="dayCalendar" class="calendar"></div></section>
+<section id="sessionPanel" class="card" style="margin-top:14px"></section>
+<section class="card nutrition" style="margin-top:14px"><h2>Selected-day energy and nutrition estimate</h2><p class="muted">Calculated from your current profile, desk-based daily activity, weight-loss goal and exercise recorded for the selected day.</p><div class="grid metrics"><div class="metric"><span class="muted">Baseline target</span><strong id="baselineCalories">—</strong><span class="muted">before exercise</span></div><div class="metric"><span class="muted">Exercise burn</span><strong id="exerciseCalories">—</strong><span class="muted">above resting energy</span></div><div class="metric"><span class="muted">Suggested intake</span><strong id="targetCalories">—</strong><span class="muted">to maintain planned deficit</span></div><div class="metric"><span class="muted">Daily deficit</span><strong id="deficitCalories">—</strong><span class="muted">average across 15 weeks</span></div></div><div id="macroSummary" class="callout"></div><p class="muted small">These are planning estimates, not medical advice. Heart-rate watches and MET formulas can differ substantially from actual energy expenditure.</p>
+<div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-top:16px"><div><h3 style="margin-bottom:2px">Suggested meals for this day</h3><p class="muted small" style="margin:0">Breakfast, lunch and dinner picked to roughly match the intake above.</p></div><button id="shuffleMeals" class="secondary" type="button">Shuffle suggestions</button></div>
+<div id="mealTotals" class="muted small" style="margin-top:6px"></div>
+<div id="mealSuggestions" class="meal-grid"></div>
+<p class="muted small">Meal suggestions are an estimated starting point, not a prescription — swap freely for foods you enjoy with similar calories and protein. Nutrition figures are approximate.</p>
+</section>
+<section class="grid two" style="margin-top:14px"><div><h2>Weekly training volume</h2><p class="muted">Planned versus actual minutes.</p><div id="volumeChart"></div></div><div><h2>Weekly completion</h2><p class="muted">Completed, partial or replaced days.</p><div id="completionChart"></div></div></section>
+<section class="grid two" style="margin-top:14px"><div><h2>Weight progress</h2><p class="muted">Recorded check-ins against the 15-week target line.</p><div id="weightChart"></div></div><div><h2>Selected-week calorie guidance</h2><p class="muted">Suggested intake and estimated exercise burn for each day.</p><div id="calorieChart"></div></div></section>
+<section class="grid two" style="margin-top:14px"><div class="card"><h2>Progress check-in</h2><div class="form-grid"><label>Date<input id="checkinDate" type="date"></label><label>Weight (kg)<input id="weightInput" type="number" step="0.1" value="76"></label><label>Resting HR<input id="rhrInput" type="number"></label><label>Sleep (hours)<input id="sleepInput" type="number" step="0.5"></label><label>Fatigue<select id="fatigueInput"><option>Low</option><option>Moderate</option><option>High</option></select></label></div><div class="actions"><button id="saveCheckin" class="primary" type="button">Save check-in</button></div><div id="checkinMessage" class="status" role="status" aria-live="polite"></div><h3 style="margin-top:16px">Check-in history</h3><div id="checkinHistory" class="checkin-history"></div></div><div class="card"><h2>Actual activity mix</h2><p class="muted">Minutes and estimated calories by activity.</p><div id="disciplineProgress"></div></div></section>
+<section class="card" style="margin-top:14px"><h2>Profile and calculation assumptions</h2><div class="form-grid"><label>Age<input id="profileAge" type="number" min="18" max="100"></label><label>Sex (for resting-energy calculation)<select id="profileSex"><option value="female">Female</option><option value="male">Male</option><option value="unspecified">Prefer not to say</option></select></label><label>Height (cm)<input id="profileHeight" type="number" min="120" max="220"></label><label>Starting weight (kg)<input id="profileStartWeight" type="number" step="0.1"></label><label>Goal weight (kg)<input id="profileGoalWeight" type="number" step="0.1"></label><label>Protein target (g/kg)<input id="profileProtein" type="number" step="0.1" min="1" max="2.5"></label><label>Fat (% calories)<input id="profileFat" type="number" step="1" min="20" max="40"></label></div><div class="actions"><button id="saveProfile" class="primary" type="button">Save profile</button></div><div id="profileMessage" class="status" role="status" aria-live="polite"></div></section>
+<section class="card" style="margin-top:14px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:end;flex-wrap:wrap"><div><h2>Progress report</h2><p class="muted">Generate a polished coaching-style report covering the start of the plan through a selected date.</p></div><button id="openReport" class="primary" type="button">Generate progress report</button></div></section>
+<section class="card backup" style="margin-top:14px"><h2>Backup and restore</h2><p class="muted">Entries save automatically in this browser on this Mac. Export a backup periodically.</p><div class="actions"><button id="exportBtn" class="secondary" type="button">Export JSON backup</button><label class="secondary">Import JSON<input id="importInput" type="file" accept="application/json" hidden></label><button id="resetBtn" class="secondary danger" type="button">Reset all data</button><button id="printBtn" class="secondary" type="button">Print</button></div><div id="backupStatus" class="muted small" style="margin-top:6px"></div><div id="dataMessage" class="status" role="status" aria-live="polite"></div></section>
+<div id="reportModal" class="report-modal" aria-hidden="true"><div class="report-dialog"><div class="report-toolbar"><div><h2>Project &lt;100 progress report</h2><p class="muted">Preview, copy, download or create a complete email-ready report.</p></div><button id="closeReport" class="secondary" type="button">Close</button></div><div class="form-grid"><label>Report to date<input id="reportDate" type="date"></label><label>Email recipient<input id="reportEmail" type="email" placeholder="name@example.com"></label><label>Report title<input id="reportTitle" value="Project &lt;100 Progress Update"></label></div><div class="actions"><button id="generateReport" class="primary" type="button">Refresh report</button><button id="copyReportHtml" class="secondary" type="button">Copy rich HTML</button><button id="copyWhatsApp" class="secondary" type="button">Copy WhatsApp summary</button><button id="downloadReportHtml" class="secondary" type="button">Download HTML</button><button id="downloadReportPng" class="secondary" type="button">Download PNG</button><button id="emailReport" class="primary" type="button">Create email report</button></div><div class="report-note small">“Create email report” downloads a complete .eml message containing the formatted report. Open it in Apple Mail, review it and press Send. The rest of the app remains unchanged.</div><div id="reportMessage" class="status" role="status" aria-live="polite"></div><div id="reportPreview" class="report-preview"></div></div></div>
+<footer>Calorie estimates use the Mifflin–St Jeor resting-energy equation and activity MET estimates. Data is stored locally in your browser.</footer>
+</main>
+<div id="setupModal" class="confirm-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="setupTitle">
+  <div class="confirm-dialog" style="max-width:640px;max-height:88vh;overflow:auto">
+    <h2 id="setupTitle">New training plan</h2>
+    <p class="muted small">Generates a personalised week-by-week plan from established, publicly documented endurance-training principles (progressive overload, a base/build/race-specific/taper structure, and a recovery week roughly every fourth week). It is a structured estimate, not a certified coaching plan or medical advice — see the note at the bottom before you rely on it, especially for longer distances or any pre-existing health conditions.</p>
+    <div class="form-grid">
+      <label>Plan name (shown in the plan switcher)<input id="setupLabel" placeholder="e.g. Dad's Olympic build"></label>
+      <label>Project name (shown as this plan's page title, replacing "Project &lt;100")<input id="setupProjectName" placeholder="e.g. Project <100"></label>
+      <label>Race distance<select id="setupDistance"><option value="sprint">Sprint (750 m / 20 km / 5 km)</option><option value="olympic">Olympic (1.5 km / 40 km / 10 km)</option><option value="70.3">Half (1.9 km / 90 km / 21.1 km)</option><option value="full">Full (3.8 km / 180 km / 42.2 km)</option><option value="custom">Custom distances</option></select></label>
+      <label>Race name<input id="setupRaceName" placeholder="e.g. Huskisson Sprint Triathlon"></label>
+      <label>Race date<input id="setupRaceDate" type="date"></label>
+      <label>Plan start date<input id="setupStartDate" type="date"></label>
+    </div>
+    <p class="muted small" id="setupStartDateNote"></p>
+    <div id="setupCustomDistances" class="form-grid" style="display:none">
+      <label>Swim distance (km, e.g. 0.75 for 750 m)<input id="setupSwimKm" type="number" step="0.05" min="0"></label>
+      <label>Bike distance (km)<input id="setupBikeKm" type="number" step="1" min="0"></label>
+      <label>Run distance (km)<input id="setupRunKm" type="number" step="0.5" min="0"></label>
+    </div>
+    <div class="form-grid">
+      <label>Experience level<select id="setupExperience"><option value="beginner">Beginner</option><option value="intermediate" selected>Intermediate</option><option value="advanced">Advanced</option></select></label>
+      <label>Current weekly training (hours)<input id="setupWeeklyHours" type="number" step="0.5" min="0" max="30"></label>
+    </div>
+    <label>Days available to train<div id="setupDays" class="day-picker">
+      <label class="small"><input type="checkbox" class="setupDayCheckbox" value="Monday" checked> Mon</label>
+      <label class="small"><input type="checkbox" class="setupDayCheckbox" value="Tuesday" checked> Tue</label>
+      <label class="small"><input type="checkbox" class="setupDayCheckbox" value="Wednesday" checked> Wed</label>
+      <label class="small"><input type="checkbox" class="setupDayCheckbox" value="Thursday" checked> Thu</label>
+      <label class="small"><input type="checkbox" class="setupDayCheckbox" value="Friday" checked> Fri</label>
+      <label class="small"><input type="checkbox" class="setupDayCheckbox" value="Saturday" checked> Sat</label>
+      <label class="small"><input type="checkbox" class="setupDayCheckbox" value="Sunday" checked> Sun</label>
+    </div></label>
+    <div id="setupWeeksPreview" class="callout small"></div>
+    <h3 style="margin-top:16px">Athlete profile</h3>
+    <div class="form-grid">
+      <label>Age<input id="setupAge" type="number" min="10" max="100"></label>
+      <label>Sex (for resting-energy calculation)<select id="setupSex"><option value="female">Female</option><option value="male">Male</option><option value="unspecified">Prefer not to say</option></select></label>
+      <label>Height (cm)<input id="setupHeight" type="number" min="100" max="230"></label>
+      <label>Starting weight (kg)<input id="setupStartWeight" type="number" step="0.1" min="30" max="250"></label>
+      <label>Goal weight (kg)<input id="setupGoalWeight" type="number" step="0.1" min="30" max="250"></label>
+      <label>Protein target (g/kg)<input id="setupProtein" type="number" step="0.1" min="0.5" max="3"></label>
+      <label>Fat (% of calories)<input id="setupFat" type="number" step="1" min="15" max="45"></label>
+    </div>
+    <p class="muted small">Resting-energy estimates use the Mifflin-St Jeor equation (a published, widely used formula); exercise-calorie estimates use standard MET activity values. The <em>training plan structure itself</em> is this app's own rules-based implementation of common periodisation principles, not a licensed program from a certified coaching body. If you have any underlying health conditions, are new to endurance training, or are training for 70.3/full distance, please have the plan reviewed by a coach or doctor before following it.</p>
+    <div class="actions"><button id="setupCancel" class="secondary" type="button">Cancel</button><button id="setupSave" class="primary" type="button">Save and generate plan</button></div>
+    <div id="setupMessage" class="status" role="status" aria-live="polite"></div>
+  </div>
+</div>
+<div id="confirmModal" class="confirm-modal" role="alertdialog" aria-modal="true" aria-hidden="true" aria-labelledby="confirmTitle" aria-describedby="confirmBody">
+  <div class="confirm-dialog">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmBody" class="muted"></p>
+    <div class="actions"><button id="confirmCancel" class="secondary" type="button">Cancel</button><button id="confirmOk" class="primary danger-btn" type="button">Confirm</button></div>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+"use strict";
+
+/* ================================================================
+   CONFIG & CONSTANTS shared across all profiles
+   ================================================================ */
+const STORAGE_KEY = "projectLT100TrainingDataV3";
+const LEGACY_STORAGE_KEY = "projectLT100TrainingDataV2";
+const APP_STATE_VERSION = 2;
+
+const longDate = new Intl.DateTimeFormat("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+const mediumDate = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short", year: "numeric" });
+const shortDate = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short" });
+
+const activityTypes = ["Swim", "Bike", "Run", "Strength", "Walk", "Mobility", "Yoga", "Recovery", "Race", "Other"];
+const intensities = ["Easy", "Moderate", "Hard"];
+const mets = {
+  Swim: { Easy: 6, Moderate: 8, Hard: 10 },
+  Bike: { Easy: 4, Moderate: 7, Hard: 10 },
+  Run: { Easy: 6, Moderate: 9.8, Hard: 12 },
+  Strength: { Easy: 3.5, Moderate: 5, Hard: 6 },
+  Walk: { Easy: 2.8, Moderate: 3.5, Hard: 4.3 },
+  Mobility: { Easy: 2.3, Moderate: 2.5, Hard: 3 },
+  Yoga: { Easy: 2.3, Moderate: 3, Hard: 4 },
+  Recovery: { Easy: 2, Moderate: 2.3, Hard: 2.8 },
+  Race: { Easy: 7, Moderate: 9, Hard: 11 },
+  Other: { Easy: 3, Moderate: 5, Hard: 7 }
+};
+const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+/* ================================================================
+   GENERIC UTILITIES
+   ================================================================ */
+const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
+const dateKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const completedStatus = s => ["Completed", "Partial", "Replaced"].includes(s);
+const $ = id => document.getElementById(id);
+const escapeHtml = (v = "") => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[c]));
+function mondayOnOrBefore(d) { const day = d.getDay(); const diff = day === 0 ? 6 : day - 1; return addDays(d, -diff); }
+function uid(prefix) { return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`; }
+
+/* ================================================================
+   VALIDATION HELPERS
+   ================================================================ */
+function clampNumber(raw, { min = -Infinity, max = Infinity, fallback = 0 } = {}) {
+  if (raw === "" || raw === null || raw === undefined) return { value: fallback, adjusted: false };
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return { value: fallback, adjusted: true };
+  if (n < min) return { value: min, adjusted: true };
+  if (n > max) return { value: max, adjusted: true };
+  return { value: n, adjusted: false };
+}
+function clampOrEmpty(raw, { min, max }) {
+  if (raw === "" || raw === null || raw === undefined) return { value: "", adjusted: false };
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return { value: "", adjusted: true };
+  if (n < min) return { value: String(min), adjusted: true };
+  if (n > max) return { value: String(max), adjusted: true };
+  return { value: String(n), adjusted: false };
+}
+function flashInvalid(el) { if (!el) return; el.classList.add("field-invalid"); setTimeout(() => el.classList.remove("field-invalid"), 1600); }
+
+/* ================================================================
+   PLAN GENERATOR (pure functions; unit-tested separately in tests.html)
+   Builds a personalised week-by-week plan from race distance, race
+   date, experience level, current weekly training hours and the
+   athlete's available training days. This is this app's own
+   rules-based implementation of widely documented endurance-training
+   principles (progressive overload, base/build/race-specific/taper
+   phasing, a lighter week roughly every fourth week) — it is not a
+   licensed program from any certified coaching body, and is not a
+   substitute for individual coaching or medical advice.
+   ================================================================ */
+const distancePresets = {
+  sprint: { label: "Sprint", swimKm: 0.75, bikeKm: 20, runKm: 5, peakHours: { beginner: 4, intermediate: 5.5, advanced: 7 } },
+  olympic: { label: "Olympic", swimKm: 1.5, bikeKm: 40, runKm: 10, peakHours: { beginner: 5.5, intermediate: 7.5, advanced: 9.5 } },
+  "70.3": { label: "Half (70.3)", swimKm: 1.9, bikeKm: 90, runKm: 21.1, peakHours: { beginner: 7, intermediate: 9.5, advanced: 12 } },
+  full: { label: "Full (140.6)", swimKm: 3.8, bikeKm: 180, runKm: 42.2, peakHours: { beginner: 9, intermediate: 12, advanced: 15 } },
+  custom: { label: "Custom", swimKm: null, bikeKm: null, runKm: null, peakHours: { beginner: 5, intermediate: 7, advanced: 9 } }
+};
+const phaseProfile = {
+  beginner: [["Base", .40], ["Build", .28], ["Race-specific", .18], ["Sharpen", .09], ["Race week", .05]],
+  intermediate: [["Base", .28], ["Build", .30], ["Race-specific", .25], ["Sharpen", .11], ["Race week", .06]],
+  advanced: [["Base", .20], ["Build", .30], ["Race-specific", .30], ["Sharpen", .14], ["Race week", .06]]
+};
+function disciplineSplit(distanceKey) {
+  if (distanceKey === "70.3" || distanceKey === "full") return { Swim: .18, Bike: .46, Run: .28, Strength: .08 };
+  return { Swim: .22, Bike: .40, Run: .28, Strength: .10 };
+}
+function buildPhaseWeeks(totalWeeks, experience) {
+  const profile = phaseProfile[experience] || phaseProfile.intermediate;
+  const usable = Math.max(1, totalWeeks - 1);
+  const nonRace = profile.filter(([name]) => name !== "Race week");
+  const sumFrac = nonRace.reduce((s, x) => s + x[1], 0);
+  const raw = nonRace.map(([name, frac]) => [name, frac / sumFrac * usable]);
+  const floors = raw.map(([name, v]) => [name, Math.max(1, Math.floor(v))]);
+  let assigned = floors.reduce((s, x) => s + x[1], 0);
+  let remainder = usable - assigned;
+  const order = raw.map(([, v], i) => [i, v - Math.floor(v)]).sort((a, b) => b[1] - a[1]);
+  let oi = 0;
+  while (remainder > 0 && oi < order.length) { floors[order[oi][0]][1]++; remainder--; oi++; }
+  floors.push(["Race week", 1]);
+  const weeks = [];
+  floors.forEach(([name, count]) => { for (let i = 0; i < count; i++) weeks.push(name); });
+  return weeks.slice(0, totalWeeks);
+}
+function weeklyTargetMinutes(weekIndex, phaseWeeks, baselineMinutes, peakMinutes) {
+  const phase = phaseWeeks[weekIndex];
+  const rampEndIdx = phaseWeeks.lastIndexOf("Build") >= 0 ? phaseWeeks.lastIndexOf("Build") : Math.floor(phaseWeeks.length * .6);
+  let target;
+  if (phase === "Race week") target = peakMinutes * .30;
+  else if (phase === "Sharpen") target = peakMinutes * .55;
+  else if (phase === "Base" || phase === "Build") {
+    const t = rampEndIdx === 0 ? 1 : Math.min(1, weekIndex / rampEndIdx);
+    target = baselineMinutes + (peakMinutes - baselineMinutes) * t;
+  } else target = peakMinutes * .95; // Race-specific
+  const weekNum = weekIndex + 1;
+  if (weekNum % 4 === 0 && phase !== "Race week") target *= .75;
+  return Math.round(target);
+}
+const rotation7 = [
+  { discipline: "Swim", role: "normal" }, { discipline: "Strength", role: "normal" },
+  { discipline: "Recovery", role: "normal" }, { discipline: "Strength", role: "normal" },
+  { discipline: "Bike", role: "brick" }, { discipline: "Run", role: "long" }, { discipline: "Swim", role: "normal" }
+];
+function rotationForDayCount(n) {
+  if (n >= 7) return rotation7;
+  if (n === 6) return rotation7.filter((_, i) => i !== 2);
+  if (n === 5) return rotation7.filter((_, i) => i !== 2 && i !== 1);
+  if (n === 4) return rotation7.filter((_, i) => i !== 2 && i !== 1 && i !== 3);
+  return [{ discipline: "Swim", role: "normal" }, { discipline: "Bike", role: "brick" }, { discipline: "Run", role: "long" }];
+}
+function round2(n) { return Math.round(n * 100) / 100; }
+function sessionDistance(discipline, raceDistanceKm, weekRatio, role) {
+  if (!raceDistanceKm) return null;
+  const capByDiscipline = { Swim: 1.0, Bike: .65, Run: .55 };
+  const roleFactor = role === "long" || role === "brick" ? 1 : .45;
+  const cap = (capByDiscipline[discipline] ?? .5) * roleFactor;
+  return round2(raceDistanceKm * cap * Math.max(.3, weekRatio));
+}
+function intensityByPhaseRole(phase, role) {
+  if (phase === "Race week") return role === "long" || role === "brick" ? "Race effort" : "Very easy";
+  if (phase === "Sharpen") return role === "long" ? "Z2" : "Z1–Z2";
+  if (phase === "Race-specific") return role === "long" || role === "brick" ? "Z3" : "Z2";
+  if (phase === "Build") return role === "long" ? "Z2" : "Z2–Z3";
+  return "Z1–Z2";
+}
+// Generates a full session list (with real calendar dates) for a profile's raceSetup.
+function generatePlanForSetup(raceSetup) {
+  const { distanceKey, swimKm, bikeKm, runKm, startDate, totalWeeksClamped, experience, weeklyHoursBaseline, availableDays } = raceSetup;
+  const preset = distancePresets[distanceKey] || distancePresets.custom;
+  const raceKm = {
+    Swim: distanceKey === "custom" ? swimKm : preset.swimKm,
+    Bike: distanceKey === "custom" ? bikeKm : preset.bikeKm,
+    Run: distanceKey === "custom" ? runKm : preset.runKm
+  };
+  const peakMinutes = (preset.peakHours[experience] || preset.peakHours.intermediate) * 60;
+  const baselineMinutes = Math.max(60, weeklyHoursBaseline * 60);
+  const phaseWeeks = buildPhaseWeeks(totalWeeksClamped, experience);
+  const split = disciplineSplit(distanceKey);
+  const chosenDays = dayOrder.filter(d => availableDays.includes(d));
+  const rotation = rotationForDayCount(chosenDays.length);
+  const startMonday = new Date(startDate + "T12:00:00");
+
+  const sessions = [];
+  for (let w = 0; w < totalWeeksClamped; w++) {
+    const weekNum = w + 1;
+    const phase = phaseWeeks[w];
+    const weekTotal = weeklyTargetMinutes(w, phaseWeeks, baselineMinutes, peakMinutes);
+    const weekRatio = weekTotal / peakMinutes;
+    const disciplineMinutes = { Swim: weekTotal * split.Swim, Bike: weekTotal * split.Bike, Run: weekTotal * split.Run, Strength: weekTotal * split.Strength };
+    const slots = rotation.map(r => ({ ...r }));
+    const countByDiscipline = {};
+    slots.forEach(s => { countByDiscipline[s.discipline] = (countByDiscipline[s.discipline] || 0) + 1; });
+    const isRaceDay = phase === "Race week";
+    const weekStart = addDays(startMonday, w * 7);
+
+    slots.forEach((slot, i) => {
+      const day = chosenDays[i] || dayOrder[i % 7];
+      const totalForDiscipline = disciplineMinutes[slot.discipline] || 30;
+      const countForDiscipline = countByDiscipline[slot.discipline] || 1;
+      let minutes;
+      if (slot.discipline === "Recovery") minutes = Math.round(weekTotal * .06) || 20;
+      else if (slot.role === "long" || slot.role === "brick") minutes = Math.round(totalForDiscipline * .55);
+      else minutes = Math.round(totalForDiscipline * (.45 / Math.max(1, countForDiscipline - 1) || .45));
+      minutes = Math.max(15, minutes);
+      const raceKmForDiscipline = raceKm[slot.discipline];
+      const distanceKmVal = ["Swim", "Bike", "Run"].includes(slot.discipline) ? sessionDistance(slot.discipline, raceKmForDiscipline, weekRatio, slot.role) : null;
+      const isLastSlotOfRaceWeek = isRaceDay && i === slots.length - 1;
+      const date = dateKey(addDays(weekStart, dayOrder.indexOf(day)));
+      sessions.push({
+        id: uid(`w${weekNum}s${i}`), week: weekNum, day, date,
+        discipline: isLastSlotOfRaceWeek ? "Race" : slot.discipline,
+        title: isLastSlotOfRaceWeek ? "Race day" : `${slot.discipline}${slot.role === "long" ? " – long session" : slot.role === "brick" ? " – brick session" : ""}`,
+        description: isLastSlotOfRaceWeek ? "Race day." : `${slot.discipline} session (${phase} phase)${distanceKmVal ? `, approx ${distanceKmVal} km` : ""}.`,
+        intensity: intensityByPhaseRole(phase, slot.role),
+        plannedMinutes: isLastSlotOfRaceWeek ? 100 : minutes,
+        status: "Planned", dayNotes: "", actualActivities: [], phase
+      });
+    });
+  }
+  return sessions;
+}
+
+/* ================================================================
+   LEGACY FIXED PLAN
+   The original hardcoded 15-week sprint-triathlon template. Used only
+   to migrate a pre-multi-profile installation's existing data as-is —
+   never used for newly created profiles.
+   ================================================================ */
+const legacyTemplates = {
+  base: [
+    ["Monday", "Swim", "Technique swim + easy run", "Swim 700–900 m with drills, then optional 15 min easy run", "Z1–Z2", 50],
+    ["Tuesday", "Strength", "Strength A", "Goblet squat, Romanian deadlift, step-ups, calf raises and core", "Moderate", 40],
+    ["Wednesday", "Recovery", "Recovery and mobility", "Easy walk and 10–15 minutes mobility", "Very easy", 25],
+    ["Thursday", "Strength", "Strength B", "Lat pulldown, row, push-ups, shoulder press, Pallof press and farmer carry", "Moderate", 40],
+    ["Friday", "Bike", "Bike + short brick", "50–60 min easy bike followed by 10 min easy run", "Z2", 70],
+    ["Saturday", "Run", "Long aerobic session", "Alternate 60–70 min bike and 6–7 km easy run", "Z2", 65],
+    ["Sunday", "Swim", "Endurance swim", "Relaxed continuous swimming with short rests", "Z2", 40]
+  ],
+  build: [
+    ["Monday", "Swim", "Swim endurance", "900–1000 m including drills and steady repeats", "Z2", 45],
+    ["Tuesday", "Strength", "Strength A", "Lower-body and core strength", "Moderate", 40],
+    ["Wednesday", "Recovery", "Recovery and mobility", "Walk, stretch and mobility", "Very easy", 25],
+    ["Thursday", "Strength", "Strength B", "Upper-body and core strength", "Moderate", 40],
+    ["Friday", "Bike", "Tempo bike + brick", "60 min bike including 5 × 4 min tempo, then 15–20 min run", "Z2–Z3", 80],
+    ["Saturday", "Run", "Long endurance session", "Alternate 75–90 min bike and 7 km easy run", "Z2", 80],
+    ["Sunday", "Swim", "Endurance swim", "1000 m steady with controlled breathing", "Z2", 45]
+  ],
+  race: [
+    ["Monday", "Swim", "Race-distance swim", "1000–1200 m including 750 m continuous practice", "Z2–Z3", 50],
+    ["Tuesday", "Strength", "Maintenance strength", "Reduced-volume full-body strength", "Moderate", 35],
+    ["Wednesday", "Recovery", "Recovery and mobility", "Easy walk and mobility", "Very easy", 25],
+    ["Thursday", "Run", "Controlled tempo run", "Easy warm-up, controlled tempo, easy cool-down", "Z2–Z3", 45],
+    ["Friday", "Bike", "Race-pace bike + brick", "20 km bike near goal effort followed by 3 km controlled run", "Z3", 85],
+    ["Saturday", "Run", "Long aerobic session", "Alternate 90 min bike and 8 km easy run", "Z2", 85],
+    ["Sunday", "Swim", "Open-water or endurance swim", "750–1000 m with sighting and confidence practice", "Z2", 45]
+  ],
+  sharpen: [
+    ["Monday", "Swim", "Short quality swim", "800–900 m with short race-pace efforts", "Z2–Z3", 40],
+    ["Tuesday", "Strength", "Light strength", "Two light sets of key exercises", "Easy", 25],
+    ["Wednesday", "Recovery", "Recovery", "Walk and mobility", "Very easy", 20],
+    ["Thursday", "Run", "Short tempo run", "30–35 min with three controlled efforts", "Z2–Z3", 35],
+    ["Friday", "Bike", "Short brick", "45 min bike plus 10 min run", "Z2–Z3", 55],
+    ["Saturday", "Recovery", "Easy aerobic session", "40–50 min comfortable bike or run", "Z2", 45],
+    ["Sunday", "Swim", "Relaxed swim", "700–800 m easy", "Z1–Z2", 35]
+  ],
+  raceweek: [
+    ["Monday", "Swim", "Easy race-week swim", "600–700 m relaxed with a few short pickups", "Z1–Z2", 30],
+    ["Tuesday", "Strength", "Mobility only", "Light mobility and activation", "Very easy", 20],
+    ["Wednesday", "Recovery", "Rest", "Rest or gentle walk", "Very easy", 15],
+    ["Thursday", "Run", "Short easy run", "20–25 min easy with 3 × 30 sec race rhythm", "Z1–Z2", 25],
+    ["Friday", "Bike", "Final brick", "20 min bike plus 10 min easy run", "Z2", 30],
+    ["Saturday", "Recovery", "Rest and prepare", "Equipment check, hydration and early night", "Rest", 15],
+    ["Sunday", "Race", "Huskisson Sprint Triathlon", "750 m swim, 20 km bike and 5 km run", "Race effort", 100]
+  ]
+};
+const legacyPhases = [
+  { weeks: [1, 2, 3, 4], focus: "Aerobic base and swim confidence" },
+  { weeks: [5, 6, 7, 8], focus: "Build endurance and introduce tempo" },
+  { weeks: [9, 10, 11, 12], focus: "Race-specific fitness and brick strength" },
+  { weeks: [13, 14], focus: "Sharpening and reduced volume" },
+  { weeks: [15], focus: "Race week" }
+];
+function legacyTemplateForWeek(w) {
+  if (w <= 4) return legacyTemplates.base;
+  if (w <= 8) return legacyTemplates.build;
+  if (w <= 12) return legacyTemplates.race;
+  if (w <= 14) return legacyTemplates.sharpen;
+  return legacyTemplates.raceweek;
+}
+function buildLegacyPlan(startDate) {
+  const startMonday = new Date(startDate + "T12:00:00");
+  const a = [];
+  for (let w = 1; w <= 15; w++) {
+    legacyTemplateForWeek(w).forEach((s, i) => a.push({
+      id: `w${w}-${i}`, week: w, day: s[0], date: dateKey(addDays(addDays(startMonday, (w - 1) * 7), i)),
+      discipline: s[1], title: s[2], description: s[3], intensity: s[4], plannedMinutes: s[5],
+      status: "Planned", dayNotes: "", actualActivities: [], phase: legacyPhases.find(p => p.weeks.includes(w))?.focus || ""
+    }));
+  }
+  return a;
+}
+
+/* ================================================================
+   STATE MODEL — MULTIPLE PROFILES
+   Top-level app state now holds a dictionary of profiles (each with
+   its own race setup, athlete details, sessions and check-ins) plus
+   which one is active. A pre-multi-profile installation is migrated
+   in place into a single "legacy" profile the first time this loads,
+   with its data left completely unchanged.
+   ================================================================ */
+function defaultAthlete() {
+  return { name: "", age: 40, sex: "unspecified", height: 170, startWeight: 75, goalWeight: 70, proteinPerKg: 1.6, fatPercent: 30 };
+}
+function defaultAppState() {
+  return { version: APP_STATE_VERSION, activeProfileId: null, lastBackupAt: null, profiles: {} };
+}
+function isLegacyShape(p) { return p && typeof p === "object" && Array.isArray(p.sessions) && !p.profiles; }
+
+function migrateLegacy(old) {
+  const id = "legacy";
+  const startDate = "2026-07-20";
+  const profile = {
+    id, label: "My Sprint Plan", projectName: "Project <100", createdAt: new Date().toISOString(), isLegacyFixedPlan: true,
+    raceSetup: {
+      distanceKey: "sprint", swimKm: 0.75, bikeKm: 20, runKm: 5, raceName: "Huskisson Sprint Triathlon",
+      raceDate: "2026-11-01", startDate, totalWeeksClamped: 15, experience: "intermediate", weeklyHoursBaseline: 4,
+      availableDays: [...dayOrder]
+    },
+    athlete: { name: "", age: old.profile?.age ?? 57, sex: "male", height: old.profile?.height ?? 171, startWeight: old.profile?.startWeight ?? 76, goalWeight: old.profile?.goalWeight ?? 71.5, proteinPerKg: old.profile?.proteinPerKg ?? 1.6, fatPercent: old.profile?.fatPercent ?? 30 },
+    sessions: (old.sessions || []).map(s => ({ ...s, actualActivities: Array.isArray(s.actualActivities) ? s.actualActivities : [] })),
+    checkins: Array.isArray(old.checkins) ? old.checkins : [],
+    selectedWeek: old.selectedWeek || 1, selectedDay: old.selectedDay || "Monday"
+  };
+  return { version: APP_STATE_VERSION, activeProfileId: id, lastBackupAt: old.lastBackupAt || null, profiles: { [id]: profile } };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    const parsed = JSON.parse(raw);
+    if (!parsed) return defaultAppState();
+    if (isLegacyShape(parsed)) return migrateLegacy(parsed);
+    if (parsed.profiles && typeof parsed.profiles === "object") {
+      // Defensive normalisation in case of a partially-written or hand-edited file.
+      Object.values(parsed.profiles).forEach(p => {
+        p.athlete = { ...defaultAthlete(), ...p.athlete };
+        p.checkins = Array.isArray(p.checkins) ? p.checkins : [];
+        p.sessions = Array.isArray(p.sessions) ? p.sessions.map(s => ({ ...s, actualActivities: Array.isArray(s.actualActivities) ? s.actualActivities : [] })) : [];
+        p.projectName = p.projectName || p.label || "Training Plan";
+      });
+      if (!parsed.activeProfileId || !parsed.profiles[parsed.activeProfileId]) {
+        parsed.activeProfileId = Object.keys(parsed.profiles)[0] || null;
+      }
+      return parsed;
+    }
+    return defaultAppState();
+  } catch {
+    return defaultAppState();
+  }
+}
+
+let app = loadState();
+const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
+const activeProfile = () => app.profiles[app.activeProfileId];
+const hasAnyProfile = () => Object.keys(app.profiles).length > 0;
+
+function computeTotalWeeks(startDate, raceDateStr) {
+  const start = new Date(startDate + "T12:00:00"), race = new Date(raceDateStr + "T12:00:00");
+  const weeks = Math.ceil((race - start) / (7 * 86400000));
+  return Math.min(24, Math.max(6, weeks));
+}
+function profileWeekStart(p, w) { return addDays(new Date(p.raceSetup.startDate + "T12:00:00"), (w - 1) * 7); }
+function profileWeekEnd(p, w) { return addDays(profileWeekStart(p, w), 6); }
+function profileRaceDate(p) { return new Date(p.raceSetup.raceDate + "T12:00:00"); }
+function phaseForWeek(p, w) {
+  if (p.isLegacyFixedPlan) return legacyPhases.find(ph => ph.weeks.includes(w))?.focus || "";
+  return p.sessions.find(s => s.week === w)?.phase || "";
+}
+
+// Builds a raceSetup object from the setup-wizard form fields (shared by create + edit).
+function raceSetupFromForm() {
+  const distanceKey = $("setupDistance").value;
+  const startDateRaw = $("setupStartDate").value || dateKey(new Date());
+  const startDate = dateKey(mondayOnOrBefore(new Date(startDateRaw + "T12:00:00")));
+  const raceDate = $("setupRaceDate").value;
+  return {
+    distanceKey,
+    swimKm: distanceKey === "custom" ? Number($("setupSwimKm").value) || 0 : null,
+    bikeKm: distanceKey === "custom" ? Number($("setupBikeKm").value) || 0 : null,
+    runKm: distanceKey === "custom" ? Number($("setupRunKm").value) || 0 : null,
+    raceName: $("setupRaceName").value.trim() || (distancePresets[distanceKey]?.label ? `${distancePresets[distanceKey].label} triathlon` : "Triathlon"),
+    raceDate, startDate,
+    totalWeeksClamped: raceDate ? computeTotalWeeks(startDate, raceDate) : 6,
+    experience: $("setupExperience").value,
+    weeklyHoursBaseline: clampNumber($("setupWeeklyHours").value, { min: 0, max: 30, fallback: 3 }).value,
+    availableDays: [...document.querySelectorAll(".setupDayCheckbox:checked")].map(c => c.value)
+  };
+}
+function athleteFromSetupForm() {
+  return {
+    name: $("setupLabel").value.trim(),
+    age: clampNumber($("setupAge").value, { min: 10, max: 100, fallback: 40 }).value,
+    sex: $("setupSex").value,
+    height: clampNumber($("setupHeight").value, { min: 100, max: 230, fallback: 170 }).value,
+    startWeight: clampNumber($("setupStartWeight").value, { min: 30, max: 250, fallback: 75 }).value,
+    goalWeight: clampNumber($("setupGoalWeight").value, { min: 30, max: 250, fallback: 70 }).value,
+    proteinPerKg: clampNumber($("setupProtein").value, { min: 0.5, max: 3, fallback: 1.6 }).value,
+    fatPercent: clampNumber($("setupFat").value, { min: 15, max: 45, fallback: 30 }).value
+  };
+}
+function validateRaceSetup(raceSetup) {
+  if (!raceSetup.raceDate) return "Choose a race date.";
+  if (raceSetup.totalWeeksClamped < 6) return "The race date must be at least a few weeks away.";
+  if (new Date(raceSetup.raceDate + "T12:00:00") <= new Date(raceSetup.startDate + "T12:00:00")) return "The race date must be in the future.";
+  if (!raceSetup.availableDays.length) return "Select at least one training day per week.";
+  if (raceSetup.distanceKey === "custom" && (!raceSetup.swimKm && !raceSetup.bikeKm && !raceSetup.runKm)) return "Enter at least one custom distance.";
+  return null;
+}
+function createProfileFromSetup() {
+  const raceSetup = raceSetupFromForm();
+  const err = validateRaceSetup(raceSetup);
+  if (err) return { error: err };
+  const athlete = athleteFromSetupForm();
+  const id = uid("profile");
+  const label = $("setupLabel").value.trim() || `${distancePresets[raceSetup.distanceKey]?.label || "Custom"} plan`;
+  const projectName = $("setupProjectName").value.trim() || "Training Plan";
+  const profile = {
+    id, label, projectName, createdAt: new Date().toISOString(), isLegacyFixedPlan: false,
+    raceSetup, athlete: { ...athlete, name: undefined },
+    sessions: generatePlanForSetup(raceSetup), checkins: [], selectedWeek: 1, selectedDay: raceSetup.availableDays[0] || "Monday"
+  };
+  app.profiles[id] = profile;
+  app.activeProfileId = id;
+  saveState();
+  return { profile };
+}
+function updateActiveProfileSetup() {
+  const p = activeProfile();
+  const raceSetup = raceSetupFromForm();
+  const err = validateRaceSetup(raceSetup);
+  if (err) return { error: err };
+  const athlete = athleteFromSetupForm();
+  p.label = $("setupLabel").value.trim() || p.label;
+  p.projectName = $("setupProjectName").value.trim() || p.projectName || "Training Plan";
+  p.raceSetup = raceSetup;
+  p.athlete = { ...p.athlete, ...athlete, name: undefined };
+  saveState();
+  return { profile: p };
+}
+// Regenerates only future, untouched ("Planned", nothing logged) sessions from the
+// profile's current setup. Anything already in the past, already logged against, or
+// with a status other than Planned is left exactly as it is.
+function regenerateFutureWeeks() {
+  const p = activeProfile();
+  const todayKey = dateKey(new Date());
+  const fresh = generatePlanForSetup(p.raceSetup);
+  const kept = p.sessions.filter(s => s.date < todayKey || s.status !== "Planned" || s.actualActivities.length > 0);
+  const keptDates = new Set(kept.map(s => s.date));
+  const additions = fresh.filter(s => s.date >= todayKey && !keptDates.has(s.date));
+  p.sessions = [...kept, ...additions].sort((a, b) => a.date.localeCompare(b.date) || a.day.localeCompare(b.day));
+  saveState();
+}
+function deleteActiveProfile() {
+  const ids = Object.keys(app.profiles);
+  if (ids.length <= 1) return { error: "You need at least one training plan. Create a new one before deleting this one." };
+  delete app.profiles[app.activeProfileId];
+  app.activeProfileId = Object.keys(app.profiles)[0];
+  saveState();
+  return {};
+}
+
+/* ================================================================
+   NUTRITION & CALORIE CALCULATIONS
+   Pure core decoupled from app state (see tests.html). bmrFor uses
+   the sex-specific Mifflin-St Jeor constant; "unspecified" uses the
+   midpoint between the male and female constants.
+   ================================================================ */
+function activityCalories(p, a, date) {
+  const w = weightOn(p, date), met = mets[a.type]?.[a.intensity || "Moderate"] || 5, min = Number(a.duration) || 0;
+  return Math.max(0, Math.round((met - 1) * 3.5 * w / 200 * min));
+}
+function dayCalories(p, s) { return s.actualActivities.reduce((n, a) => n + activityCalories(p, a, s.date), 0); }
+function bmrFor(weight, height, age, sex) {
+  const base = 10 * weight + 6.25 * height - 5 * age;
+  if (sex === "male") return base + 5;
+  if (sex === "female") return base - 161;
+  return base - 78; // unspecified: midpoint of the male/female constants
+}
+function dailyDeficitFor(startWeight, goalWeight, days) { return Math.max(0, (Number(startWeight) - Number(goalWeight)) * 7700 / days); }
+function macroSplitFor(target, weight, proteinPerKg, fatPercent) {
+  const protein = Math.round(proteinPerKg * weight);
+  const fat = Math.round(target * (fatPercent / 100) / 9);
+  const carbs = Math.max(0, Math.round((target - protein * 4 - fat * 9) / 4));
+  return { protein, fat, carbs };
+}
+function nutritionCalc({ weight, height, age, sex, startWeight, goalWeight, days, burn, proteinPerKg, fatPercent }) {
+  const deficit = dailyDeficitFor(startWeight, goalWeight, days);
+  const base = bmrFor(weight, height, age, sex) * 1.2 - deficit;
+  const target = Math.max(1500, base + burn);
+  const macros = macroSplitFor(target, weight, proteinPerKg, fatPercent);
+  return { w: weight, base: Math.round(base), burn, target: Math.round(target), deficit: Math.round(deficit), ...macros };
+}
+function weightOn(p, date) {
+  const c = p.checkins.filter(x => x.weight && x.date <= date).sort((a, b) => a.date.localeCompare(b.date));
+  return Number(c.at(-1)?.weight || p.athlete.startWeight);
+}
+function nutritionFor(p, s) {
+  const w = weightOn(p, s.date), burn = dayCalories(p, s);
+  return nutritionCalc({
+    weight: w, height: Number(p.athlete.height), age: Number(p.athlete.age), sex: p.athlete.sex,
+    startWeight: Number(p.athlete.startWeight), goalWeight: Number(p.athlete.goalWeight),
+    days: p.raceSetup.totalWeeksClamped * 7, burn, proteinPerKg: Number(p.athlete.proteinPerKg), fatPercent: Number(p.athlete.fatPercent)
+  });
+}
+const currentSession = () => { const p = activeProfile(); return p.sessions.find(s => s.week === p.selectedWeek && s.day === p.selectedDay); };
+const totalMinutes = s => s.actualActivities.reduce((n, a) => n + (Number(a.duration) || 0), 0);
+
+/* ================================================================
+   UI: TOAST NOTIFICATIONS & CONFIRM MODAL
+   ================================================================ */
+let toastTimer = null;
+function showToast(message, { actionLabel, onAction, duration = 6000 } = {}) {
+  const el = $("toast");
+  if (!el) return;
+  el.innerHTML = `<span>${escapeHtml(message)}</span>` + (actionLabel ? `<button type="button" class="toast-action">${escapeHtml(actionLabel)}</button>` : "");
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  if (actionLabel && onAction) el.querySelector(".toast-action").addEventListener("click", () => { onAction(); hideToast(); });
+  toastTimer = setTimeout(hideToast, duration);
+}
+function hideToast() { $("toast")?.classList.remove("show"); }
+function askConfirm(title, body) {
+  return new Promise(resolve => {
+    const modal = $("confirmModal");
+    if (!modal) { resolve(window.confirm(body)); return; }
+    $("confirmTitle").textContent = title;
+    $("confirmBody").textContent = body;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    const okBtn = $("confirmOk"), cancelBtn = $("confirmCancel");
+    const cleanup = result => { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); okBtn.removeEventListener("click", onOk); cancelBtn.removeEventListener("click", onCancel); resolve(result); };
+    const onOk = () => cleanup(true), onCancel = () => cleanup(false);
+    okBtn.addEventListener("click", onOk); cancelBtn.addEventListener("click", onCancel); okBtn.focus();
+  });
+}
+
+/* ================================================================
+   UI: SETUP WIZARD (create a new plan / edit an existing plan's setup)
+   ================================================================ */
+let setupMode = "create";
+function toggleCustomDistanceFields() { $("setupCustomDistances").style.display = $("setupDistance").value === "custom" ? "grid" : "none"; }
+function updateWeeksPreview() {
+  const raceDate = $("setupRaceDate").value;
+  const startDateRaw = $("setupStartDate").value || dateKey(new Date());
+  const startDate = dateKey(mondayOnOrBefore(new Date(startDateRaw + "T12:00:00")));
+  const snapNote = startDate !== startDateRaw ? ` (snapped to that week's Monday, ${mediumDate.format(new Date(startDate + "T12:00:00"))}, since weeks run Monday–Sunday)` : "";
+  $("setupStartDateNote").textContent = `Plan weeks run Monday–Sunday, so this plan will start ${mediumDate.format(new Date(startDate + "T12:00:00"))}${snapNote}.`;
+  if (!raceDate) { $("setupWeeksPreview").textContent = "Choose a race date to see the plan length."; return; }
+  const weeks = computeTotalWeeks(startDate, raceDate);
+  const raw = Math.ceil((new Date(raceDate + "T12:00:00") - new Date(startDate + "T12:00:00")) / (7 * 86400000));
+  const note = raw < 6 ? " Your race is sooner than that — the plan will be compressed into 6 weeks." : raw > 24 ? " That's a long lead time — the plan covers the final 24 weeks before race day, starting closer to it." : "";
+  $("setupWeeksPreview").textContent = `Runs ${weeks} weeks from start to race day.${note}`;
+}
+function fillSetupForm(mode) {
+  setupMode = mode;
+  const p = mode === "edit" ? activeProfile() : null;
+  $("setupTitle").textContent = mode === "edit" ? "Edit plan setup" : "New training plan";
+  $("setupSave").textContent = mode === "edit" ? "Save changes" : "Save and generate plan";
+  const rs = p ? p.raceSetup : { distanceKey: "sprint", raceName: "", raceDate: "", startDate: dateKey(mondayOnOrBefore(new Date())), experience: "intermediate", weeklyHoursBaseline: 3, availableDays: [...dayOrder], swimKm: "", bikeKm: "", runKm: "" };
+  const ath = p ? p.athlete : defaultAthlete();
+  $("setupLabel").value = p ? p.label : "";
+  $("setupProjectName").value = p ? (p.projectName || "") : "";
+  $("setupDistance").value = rs.distanceKey;
+  $("setupRaceName").value = rs.raceName || "";
+  $("setupRaceDate").value = rs.raceDate || "";
+  $("setupStartDate").value = rs.startDate || dateKey(mondayOnOrBefore(new Date()));
+  $("setupSwimKm").value = rs.swimKm ?? "";
+  $("setupBikeKm").value = rs.bikeKm ?? "";
+  $("setupRunKm").value = rs.runKm ?? "";
+  $("setupExperience").value = rs.experience || "intermediate";
+  $("setupWeeklyHours").value = rs.weeklyHoursBaseline ?? 3;
+  document.querySelectorAll(".setupDayCheckbox").forEach(c => { c.checked = (rs.availableDays || dayOrder).includes(c.value); });
+  $("setupAge").value = ath.age;
+  $("setupSex").value = ath.sex || "unspecified";
+  $("setupHeight").value = ath.height;
+  $("setupStartWeight").value = ath.startWeight;
+  $("setupGoalWeight").value = ath.goalWeight;
+  $("setupProtein").value = ath.proteinPerKg;
+  $("setupFat").value = ath.fatPercent;
+  $("setupMessage").textContent = mode === "edit" ? "Changing setup only affects future, not-yet-started sessions — use \u201cRegenerate future weeks\u201d after saving to apply it. The start date only moves if you change it here." : "";
+  toggleCustomDistanceFields();
+  updateWeeksPreview();
+}
+function openSetup(mode) {
+  fillSetupForm(mode);
+  $("setupModal").classList.add("open");
+  $("setupModal").setAttribute("aria-hidden", "false");
+}
+function closeSetup() { $("setupModal").classList.remove("open"); $("setupModal").setAttribute("aria-hidden", "true"); }
+function saveSetup() {
+  const result = setupMode === "edit" ? updateActiveProfileSetup() : createProfileFromSetup();
+  if (result.error) { $("setupMessage").textContent = result.error; return; }
+  closeSetup();
+  renderAll();
+  showToast(setupMode === "edit" ? "Plan setup updated." : "New plan created.");
+}
+
+/* ================================================================
+   UI: HEADER / PROFILE SWITCHER
+   ================================================================ */
+function renderHeader() {
+  const p = activeProfile();
+  $("profileSelect").innerHTML = Object.values(app.profiles)
+    .sort((a, b) => a.label.localeCompare(b.label))
+    .map(pr => `<option value="${pr.id}" ${pr.id === app.activeProfileId ? "selected" : ""}>${escapeHtml(pr.label)}</option>`).join("");
+  $("appTitle").textContent = p.projectName || "Training Plan";
+  document.title = `${p.projectName || "Training Plan"} — Training Tracker`;
+  $("raceLine").textContent = `${p.raceSetup.raceName || "Untitled race"} · ${longDate.format(profileRaceDate(p))}`;
+  $("regenerateBar").style.display = p.isLegacyFixedPlan ? "none" : "flex";
+  $("deleteProfileBtn").disabled = Object.keys(app.profiles).length <= 1;
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+function showEmptyState() {
+  $("raceLine").textContent = "Create your first training plan to get started.";
+  $("appTitle").textContent = "Triathlon Training Tracker";
+  document.title = "Triathlon Training Tracker";
+  $("weekSummary").textContent = "";
+  $("dayCalendar").innerHTML = "";
+  $("sessionPanel").innerHTML = '<p class="muted">Create a training plan to begin.</p>';
+  $("profileSelect").innerHTML = "";
+  $("regenerateBar").style.display = "none";
+  openSetup("create");
+}
+function initialise() {
+  $("checkinDate").value = dateKey(new Date());
+  $("weekSelect").addEventListener("change", () => {
+    const p = activeProfile();
+    p.selectedWeek = Number($("weekSelect").value);
+    p.selectedDay = p.sessions.find(s => s.week === p.selectedWeek)?.day || dayOrder[0];
+    saveState();
+    renderAll();
+  });
+  $("profileSelect").addEventListener("change", () => { app.activeProfileId = $("profileSelect").value; saveState(); renderAll(); });
+  $("newProfileBtn").addEventListener("click", () => openSetup("create"));
+  $("editProfileBtn").addEventListener("click", () => openSetup("edit"));
+  $("deleteProfileBtn").addEventListener("click", async () => {
+    if (Object.keys(app.profiles).length <= 1) { showToast("Create another plan before deleting this one."); return; }
+    const ok = await askConfirm("Delete this plan?", `This permanently deletes "${activeProfile().label}", including all its logged history and check-ins.`);
+    if (!ok) return;
+    const r = deleteActiveProfile();
+    if (r.error) { showToast(r.error); return; }
+    renderAll();
+    showToast("Plan deleted.");
+  });
+  $("regenerateBtn").addEventListener("click", async () => {
+    const ok = await askConfirm("Regenerate future weeks?", "This replaces any not-yet-started, not-yet-logged sessions with a fresh plan based on the current setup. Anything already logged or in the past is left untouched.");
+    if (!ok) return;
+    regenerateFutureWeeks();
+    renderAll();
+    showToast("Future weeks regenerated.");
+  });
+  $("setupDistance").addEventListener("change", () => { toggleCustomDistanceFields(); updateWeeksPreview(); });
+  $("setupRaceDate").addEventListener("change", updateWeeksPreview);
+  $("setupStartDate").addEventListener("change", updateWeeksPreview);
+  $("setupCancel").addEventListener("click", closeSetup);
+  $("setupSave").addEventListener("click", saveSetup);
+  $("saveCheckin").addEventListener("click", saveCheckin);
+  $("shuffleMeals").addEventListener("click", () => {
+    const s = currentSession();
+    if (!s) return;
+    s.mealSeed = Math.random().toString(36).slice(2);
+    saveState();
+    renderMealSuggestions(nutritionFor(activeProfile(), s), s);
+  });
+  $("saveProfile").addEventListener("click", saveProfile);
+  $("exportBtn").addEventListener("click", exportBackup);
+  $("importInput").addEventListener("change", importBackup);
+  $("resetBtn").addEventListener("click", resetData);
+  $("printBtn").addEventListener("click", () => print());
+  $("openReport").addEventListener("click", openReport);
+  $("closeReport").addEventListener("click", closeReport);
+  $("generateReport").addEventListener("click", renderProgressReport);
+  $("copyReportHtml").addEventListener("click", copyReportHtml);
+  $("copyWhatsApp").addEventListener("click", copyWhatsApp);
+  $("downloadReportHtml").addEventListener("click", downloadReportHtml);
+  $("downloadReportPng").addEventListener("click", downloadReportPng);
+  $("emailReport").addEventListener("click", emailReport);
+
+  if (!hasAnyProfile()) {
+    // Genuinely fresh install (or an empty/corrupted state) — prompt for a real setup
+    // rather than silently handing the person someone else's hardcoded plan.
+    showEmptyState();
+    return;
+  }
+  renderAll();
+}
+
+/* ================================================================
+   UI: WEEK SELECT & CALENDAR
+   ================================================================ */
+function renderWeekSelect() {
+  const p = activeProfile();
+  const weeks = p.raceSetup.totalWeeksClamped;
+  $("weekSelect").innerHTML = Array.from({ length: weeks }, (_, i) =>
+    `<option value="${i + 1}">Week ${i + 1}: ${shortDate.format(profileWeekStart(p, i + 1))} – ${shortDate.format(profileWeekEnd(p, i + 1))}</option>`
+  ).join("");
+  $("weekSelect").value = Math.min(p.selectedWeek, weeks);
+}
+function renderCalendar() {
+  const p = activeProfile();
+  const ss = p.sessions.filter(s => s.week === p.selectedWeek);
+  const actual = ss.reduce((n, s) => n + totalMinutes(s), 0);
+  const planned = ss.reduce((n, s) => n + s.plannedMinutes, 0);
+  $("weekSummary").textContent = `Week ${p.selectedWeek} · ${mediumDate.format(profileWeekStart(p, p.selectedWeek))} to ${mediumDate.format(profileWeekEnd(p, p.selectedWeek))} · ${phaseForWeek(p, p.selectedWeek)} · ${actual} of ${planned} minutes logged`;
+  $("dayCalendar").innerHTML = ss.map(s => {
+    const active = s.day === p.selectedDay;
+    return `<button type="button" class="day ${active ? "active" : ""} ${completedStatus(s.status) ? "done" : ""}" data-day="${s.day}" aria-pressed="${active}"><div class="muted">${s.day}</div><strong>${shortDate.format(new Date(s.date + "T12:00:00"))}</strong><div style="margin-top:8px">${s.discipline}</div><span class="pill">${s.status}</span><div class="muted small" style="margin-top:6px">${s.actualActivities.length} activities · ${dayCalories(p, s)} kcal</div></button>`;
+  }).join("");
+  document.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => {
+    p.selectedDay = b.dataset.day;
+    saveState();
+    renderCalendar(); renderSession(); renderNutrition(); renderCharts();
+  }));
+}
+
+/* ================================================================
+   UI: SESSION PANEL & ACTIVITY LOGGING
+   ================================================================ */
+/* ================================================================
+   SESSION GUIDES
+   Turns a generic "Swim session (Base phase)" line into something
+   actually actionable: named drills with cues for swim, a structured
+   set description for bike, and named strength exercises each shown
+   with a simple original icon and a short technique cue. Content is
+   general, common-knowledge training guidance (not sourced from any
+   specific coach or program) — same caveat as the plan generator.
+   ================================================================ */
+function normalizedPhase(s) {
+  if (["Base", "Build", "Race-specific", "Sharpen", "Race week"].includes(s.phase)) return s.phase;
+  // Legacy sessions store the phase's descriptive focus text instead of a short key;
+  // map by week number using the same ranges the legacy plan was built from.
+  if (s.week <= 4) return "Base";
+  if (s.week <= 8) return "Build";
+  if (s.week <= 12) return "Race-specific";
+  if (s.week <= 14) return "Sharpen";
+  return "Race week";
+}
+function inferSessionRole(s) {
+  const t = `${s.title} ${s.description}`.toLowerCase();
+  if (t.includes("brick")) return "brick";
+  if (t.includes("long")) return "long";
+  return "normal";
+}
+const swimDrillPool = {
+  technique: [
+    { name: "Catch-up drill", cue: "One arm stays extended in front until the other completes its full stroke, then swap. Builds a longer, cleaner catch." },
+    { name: "Fingertip drag", cue: "Drag fingertips along the surface during recovery to encourage a high elbow and relaxed arm swing." },
+    { name: "Single-arm swim", cue: "Swim with one arm only, the other resting at your side; focus on rotation and a smooth catch." },
+    { name: "6-kick switch", cue: "Six kicks on your side, then rotate and take one stroke; repeat. Reinforces body rotation and balance." }
+  ],
+  kick: [
+    { name: "Board kick", cue: "Kick holding a board (or arms extended out front), steady tempo, minimal knee bend — power from the hips." },
+    { name: "Vertical kick", cue: "Tread water using only a flutter kick, hands out of the water; builds kick strength and ankle flexibility." }
+  ],
+  pull: [
+    { name: "Pull buoy set", cue: "Legs still (pull buoy between the thighs), focus entirely on arm pull and body rotation." },
+    { name: "Light paddle work", cue: "Easy-effort paddle repeats to reinforce the catch and pull pattern — stop at the first sign of shoulder strain." }
+  ],
+  aerobic: [
+    { name: "Broken swim (e.g. 4 x 100 m)", cue: "Swim the set distance in even, controlled repeats with 15–20 sec rest between each — builds endurance without excess fatigue." },
+    { name: "Continuous steady swim", cue: "One unbroken swim at a comfortable, sustainable pace — aim for a consistent stroke count per length." }
+  ],
+  race: [
+    { name: "Race-pace repeats", cue: "Short repeats (25–50 m) at the effort you plan to hold on race day, with full recovery between each." },
+    { name: "Open-water sighting practice", cue: "Every 6–8 strokes, lift your eyes just above the waterline to spot a landmark ahead, then return to normal stroke." }
+  ]
+};
+function swimSessionGuide(phase, role) {
+  const warmupM = role === "long" ? 300 : 200;
+  let cats, main;
+  if (phase === "Base") { cats = ["technique", "kick"]; main = "Aerobic main set focused on smooth technique, not speed."; }
+  else if (phase === "Build") { cats = ["technique", "pull"]; main = "Aerobic main set with a couple of slightly firmer efforts mixed in."; }
+  else if (phase === "Race-specific") { cats = ["pull", "race"]; main = "Main set includes race-pace work to rehearse race effort."; }
+  else if (phase === "Sharpen") { cats = ["technique", "race"]; main = "Shorter, crisp main set — quality over volume this close to race day."; }
+  else { cats = ["technique"]; main = "Easy, relaxed swim — nothing to prove during race week."; }
+  return { warmup: `${warmupM} m easy freestyle, building gradually into your normal stroke rhythm.`, drills: cats.flatMap(c => swimDrillPool[c]).slice(0, 3), main, cooldown: "100–150 m very easy, any stroke, to bring the heart rate down." };
+}
+function bikeSessionGuide(phase, role) {
+  let structure, cue;
+  if (role === "brick") { structure = "Steady endurance-pace ride, then straight off the bike into the run with minimal transition time."; cue = "Practise the dismount-to-run transition — legs will feel heavy for the first few minutes; that's normal and improves with practice."; }
+  else if (phase === "Base") { structure = "Continuous easy-to-moderate ride at a conversational pace throughout."; cue = "Aim for a smooth, high cadence (around 85–95 rpm) rather than pushing a big gear."; }
+  else if (phase === "Build") { structure = "Include 3–5 x 3–5 min efforts at a firm, controlled pace with easy spinning between each."; cue = "Keep the effort controlled — you should be able to hold a short sentence during the hard efforts."; }
+  else if (phase === "Race-specific") { structure = "Extended efforts at your target race intensity, simulating race conditions where possible."; cue = "A good session to practise race-day nutrition and hydration timing."; }
+  else if (phase === "Sharpen") { structure = "Shorter ride with a few brief, sharp efforts to keep the legs feeling snappy."; cue = "This is about feel, not fitness — back off if anything feels heavy."; }
+  else { structure = "Very easy spin, just enough to keep the legs loose."; cue = "Nothing hard this close to race day."; }
+  return { structure, cue, cadence: "During the warm-up, include a few short cadence bursts (30 sec at a quick, light-pressure spin) to wake up the legs." };
+}
+const strengthExercises = {
+  "Goblet squat": { pose: "squat", cue: "Hold a weight at chest height, feet shoulder-width, squat until thighs are roughly parallel, drive up through the heels." },
+  "Romanian deadlift": { pose: "hinge", cue: "Soft knees, hinge at the hips keeping the back flat, lower the weight along the front of the legs, feel it in the hamstrings." },
+  "Step-ups": { pose: "stepup", cue: "Step fully onto a box or sturdy step, drive up through the lead leg, control the descent back down." },
+  "Calf raises": { pose: "calf", cue: "Rise onto the balls of the feet, pause briefly at the top, lower slowly under control." },
+  "Core (plank variations)": { pose: "plank", cue: "Hold a straight line from shoulders to ankles, brace the abdomen, breathe steadily throughout." },
+  "Lat pulldown": { pose: "pulldown", cue: "Pull the bar to upper chest, squeeze the shoulder blades together, control the return." },
+  "Row": { pose: "row", cue: "Pull the elbows back past the ribs, squeeze the shoulder blades, avoid using momentum." },
+  "Push-ups": { pose: "pushup", cue: "Hands under shoulders, lower the chest close to the floor, keep the body in a straight line throughout." },
+  "Shoulder press": { pose: "press", cue: "Press directly overhead, avoid arching the lower back, lower under control." },
+  "Pallof press": { pose: "pallof", cue: "Hold a band or cable at chest height, press straight out and resist the urge to rotate." },
+  "Farmer carry": { pose: "carry", cue: "Walk tall carrying a weight in each hand, shoulders back, brace the core with every step." }
+};
+const strengthSetA = ["Goblet squat", "Romanian deadlift", "Step-ups", "Calf raises", "Core (plank variations)"];
+const strengthSetB = ["Lat pulldown", "Row", "Push-ups", "Shoulder press", "Pallof press", "Farmer carry"];
+function strengthSessionExercises(s) {
+  const t = s.title.toLowerCase();
+  if (t.includes("strength a")) return strengthSetA;
+  if (t.includes("strength b")) return strengthSetB;
+  return s.week % 2 === 1 ? strengthSetA : strengthSetB;
+}
+// Original pictogram-style icons (not derived from any external image or photo): a filled
+// head, a thick rounded "capsule" torso line, and thinner rounded-cap limb lines — the same
+// technique used by minimalist fitness-app iconography — with a distinct, anatomically
+// reasonable pose per exercise rather than a handful of generic shared shapes.
+function limbLine([x1, y1, x2, y2], width = 6.5) { return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="currentColor" stroke-width="${width}" stroke-linecap="round"/>`; }
+function bodyFigure({ head, torso, limbs = [], props = "" }) {
+  const [hx, hy] = head;
+  return `<circle cx="${hx}" cy="${hy}" r="6.5" fill="currentColor"/>${limbLine(torso, 9)}${limbs.map(l => limbLine(l)).join("")}${props}`;
+}
+const posePool = {
+  squat: () => bodyFigure({
+    head: [32, 14], torso: [32, 20, 32, 34],
+    limbs: [[32, 34, 22, 44], [22, 44, 20, 54], [32, 34, 42, 44], [42, 44, 44, 54], [32, 21, 26, 29], [32, 21, 38, 29]],
+    props: `<rect x="24" y="26" width="16" height="8" rx="3" fill="currentColor" opacity=".55"/>`
+  }),
+  hinge: () => bodyFigure({
+    head: [18, 16], torso: [20, 21, 32, 32],
+    limbs: [[32, 32, 34, 44], [34, 44, 36, 54], [20, 21, 16, 40]],
+    props: `<rect x="6" y="38.5" width="20" height="5" rx="2.5" fill="currentColor" opacity=".55"/>`
+  }),
+  stepup: () => bodyFigure({
+    head: [26, 12], torso: [27, 18, 28, 32],
+    limbs: [[28, 32, 34, 42], [34, 42, 40, 48], [28, 32, 20, 42], [20, 42, 16, 52], [27, 19, 20, 27], [27, 19, 34, 25]],
+    props: `<rect x="36" y="48" width="16" height="6" rx="2" fill="currentColor" opacity=".35"/>`
+  }),
+  calf: () => bodyFigure({
+    head: [32, 12], torso: [32, 18, 32, 34],
+    limbs: [[32, 34, 28, 52], [32, 34, 36, 52], [32, 18, 24, 32], [32, 18, 40, 32]],
+    props: `<path d="M25,47 l3,-4 l3,4" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M33,47 l3,-4 l3,4" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>`
+  }),
+  plank: () => bodyFigure({
+    head: [12, 26], torso: [18, 28, 46, 28],
+    limbs: [[46, 28, 56, 34], [18, 28, 18, 40]],
+    props: `<line x1="6" y1="42" x2="58" y2="42" stroke="currentColor" stroke-width="2" opacity=".25"/>`
+  }),
+  pallof: () => bodyFigure({
+    head: [30, 12], torso: [30, 18, 30, 34],
+    limbs: [[30, 34, 25, 54], [30, 34, 36, 52], [30, 22, 48, 22]],
+    props: `<line x1="48" y1="22" x2="58" y2="32" stroke="currentColor" stroke-width="2" stroke-dasharray="3,3" opacity=".6"/><rect x="57" y="30" width="5" height="5" rx="1" fill="currentColor" opacity=".55"/>`
+  }),
+  pulldown: () => bodyFigure({
+    head: [32, 14], torso: [32, 19, 32, 38],
+    limbs: [[32, 38, 25, 42], [32, 38, 39, 42], [32, 19, 18, 10], [32, 19, 46, 10]],
+    props: `<rect x="24" y="39" width="16" height="5" rx="2" fill="currentColor" opacity=".35"/><line x1="14" y1="8" x2="50" y2="8" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".55"/>`
+  }),
+  row: () => bodyFigure({
+    head: [42, 16], torso: [40, 22, 30, 34],
+    limbs: [[30, 34, 18, 36], [18, 36, 8, 38], [40, 22, 30, 24], [30, 24, 22, 24]],
+    props: `<line x1="22" y1="24" x2="2" y2="24" stroke="currentColor" stroke-width="2" stroke-dasharray="3,3" opacity=".6"/>`
+  }),
+  pushup: () => bodyFigure({
+    head: [12, 24], torso: [18, 26, 42, 28],
+    limbs: [[42, 28, 54, 34], [18, 26, 16, 34], [16, 34, 20, 40]],
+    props: `<line x1="8" y1="44" x2="58" y2="44" stroke="currentColor" stroke-width="2" opacity=".25"/>`
+  }),
+  press: () => bodyFigure({
+    head: [32, 14], torso: [32, 20, 32, 36],
+    limbs: [[32, 36, 27, 54], [32, 36, 37, 54], [24, 20, 20, 6], [40, 20, 44, 6]],
+    props: `<circle cx="20" cy="6" r="4" fill="currentColor" opacity=".55"/><circle cx="44" cy="6" r="4" fill="currentColor" opacity=".55"/>`
+  }),
+  carry: () => bodyFigure({
+    head: [32, 12], torso: [32, 18, 32, 34],
+    limbs: [[32, 34, 24, 44], [24, 44, 20, 54], [32, 34, 40, 42], [40, 42, 44, 50], [24, 18, 22, 38], [40, 18, 42, 38]],
+    props: `<rect x="18" y="36" width="8" height="6" rx="2" fill="currentColor" opacity=".55"/><rect x="38" y="36" width="8" height="6" rx="2" fill="currentColor" opacity=".55"/>`
+  })
+};
+function strengthIconSvg(pose) {
+  const build = posePool[pose] || posePool.plank;
+  return `<svg viewBox="0 0 64 64" width="48" height="48" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="currentColor" opacity=".08"/>${build()}</svg>`;
+}
+function sessionGuideHtml(s) {
+  const phase = normalizedPhase(s), role = inferSessionRole(s);
+  if (s.discipline === "Swim") {
+    const g = swimSessionGuide(phase, role);
+    return `<details class="session-guide"><summary>Swim session guide</summary>
+      <p><strong>Warm-up:</strong> ${escapeHtml(g.warmup)}</p>
+      <p><strong>Drills:</strong></p>
+      <ul>${g.drills.map(d => `<li><strong>${escapeHtml(d.name)}:</strong> ${escapeHtml(d.cue)}</li>`).join("")}</ul>
+      <p><strong>Main set:</strong> ${escapeHtml(g.main)}</p>
+      <p><strong>Cool-down:</strong> ${escapeHtml(g.cooldown)}</p>
+    </details>`;
+  }
+  if (s.discipline === "Bike") {
+    const g = bikeSessionGuide(phase, role);
+    return `<details class="session-guide"><summary>Bike session guide</summary>
+      <p><strong>Structure:</strong> ${escapeHtml(g.structure)}</p>
+      <p><strong>Technique cue:</strong> ${escapeHtml(g.cue)}</p>
+      <p><strong>Cadence drill:</strong> ${escapeHtml(g.cadence)}</p>
+    </details>`;
+  }
+  if (s.discipline === "Strength") {
+    const names = strengthSessionExercises(s);
+    return `<details class="session-guide" open><summary>Exercises in this session</summary>
+      <div class="exercise-grid">${names.map(n => { const ex = strengthExercises[n] || { pose: "plank", cue: "" }; return `<div class="exercise-card">${strengthIconSvg(ex.pose)}<strong>${escapeHtml(n)}</strong><span class="muted small">${escapeHtml(ex.cue)}</span></div>`; }).join("")}</div>
+    </details>`;
+  }
+  return "";
+}
+
+function activityEditor(p, a, i, s) {
+  return `<div class="activity" data-index="${i}"><div class="activity-head"><h3>Actual activity ${i + 1}${a.source === "planned-auto" ? ' <span class="pill">from plan</span>' : ''}</h3><button type="button" class="secondary removeActivity">Remove</button></div><div class="form-grid"><label>Activity<select class="activityType">${activityTypes.map(t => `<option ${a.type === t ? "selected" : ""}>${t}</option>`).join("")}</select></label><label>Intensity<select class="activityIntensity">${intensities.map(t => `<option ${a.intensity === t ? "selected" : ""}>${t}</option>`).join("")}</select></label><label>Duration (minutes)<input class="activityDuration" type="number" min="0" max="600" value="${escapeHtml(a.duration)}"></label><label>Distance<input class="activityDistance" value="${escapeHtml(a.distance)}" placeholder="e.g. 750 m or 20 km"></label><label>Average HR<input class="activityHr" type="number" min="0" max="250" value="${escapeHtml(a.avgHr)}"></label><label>Maximum HR<input class="activityMaxHr" type="number" min="0" max="250" value="${escapeHtml(a.maxHr)}"></label><label>RPE 1–10<input class="activityRpe" type="number" min="1" max="10" value="${escapeHtml(a.rpe)}"></label><div><span class="muted small">Estimated burn</span><strong>${activityCalories(p, a, s.date)} kcal</strong></div></div><label>Activity notes<textarea class="activityNotes" rows="2">${escapeHtml(a.notes)}</textarea></label></div>`;
+}
+function collectActivities() {
+  const s = currentSession();
+  let adjusted = false;
+  s.actualActivities = [...document.querySelectorAll(".activity")].map((r, i) => {
+    const duration = clampOrEmpty(r.querySelector(".activityDuration").value, { min: 0, max: 600 });
+    const avgHr = clampOrEmpty(r.querySelector(".activityHr").value, { min: 0, max: 250 });
+    const maxHr = clampOrEmpty(r.querySelector(".activityMaxHr").value, { min: 0, max: 250 });
+    const rpe = clampOrEmpty(r.querySelector(".activityRpe").value, { min: 1, max: 10 });
+    if (duration.adjusted || avgHr.adjusted || maxHr.adjusted || rpe.adjusted) adjusted = true;
+    return { ...s.actualActivities[i], type: r.querySelector(".activityType").value, intensity: r.querySelector(".activityIntensity").value, duration: duration.value, distance: r.querySelector(".activityDistance").value, avgHr: avgHr.value, maxHr: maxHr.value, rpe: rpe.value, notes: r.querySelector(".activityNotes").value };
+  });
+  return adjusted;
+}
+function plannedIntensity(s) { return /Z3|race/i.test(s.intensity) ? "Hard" : /very easy|rest|Z1/i.test(s.intensity) ? "Easy" : "Moderate"; }
+function addPlannedIfCompleted(s) {
+  if (s.status !== "Completed") return;
+  const equivalent = s.actualActivities.some(a => a.source === "planned-auto" || (a.type === s.discipline && Number(a.duration) === Number(s.plannedMinutes)));
+  if (!equivalent) s.actualActivities.unshift({ type: activityTypes.includes(s.discipline) ? s.discipline : "Other", intensity: plannedIntensity(s), duration: s.plannedMinutes, distance: "", avgHr: "", maxHr: "", rpe: "", notes: `Completed planned session: ${s.title}`, source: "planned-auto" });
+}
+function renderSession() {
+  const p = activeProfile(), s = currentSession();
+  if (!s) { $("sessionPanel").innerHTML = '<p class="muted">No session for this day.</p>'; return; }
+  const dt = new Date(s.date + "T12:00:00");
+  $("sessionPanel").innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="muted">Week ${s.week} · ${longDate.format(dt)}</div><h2>Planned: ${s.title}</h2><p class="muted">${s.description}</p></div><span class="pill">${s.status}</span></div><div class="planned"><div><span class="muted">Planned discipline</span><strong>${s.discipline}</strong></div><div><span class="muted">Planned time</span><strong>${s.plannedMinutes} minutes</strong></div><div><span class="muted">Intensity</span><strong>${s.intensity}</strong></div></div>${sessionGuideHtml(s)}<div class="form-grid"><label>Overall result<select id="statusInput">${["Planned", "Completed", "Partial", "Skipped", "Rescheduled", "Replaced"].map(v => `<option ${s.status === v ? "selected" : ""}>${v}</option>`).join("")}</select></label><label>General day notes<input id="dayNotesInput" value="${escapeHtml(s.dayNotes)}"></label></div><div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-top:18px"><div><h2>What I actually did</h2><p class="muted">Choosing Completed and saving automatically adds the planned session if it is not already listed.</p></div><button id="addActivity" class="secondary" type="button">Add activity</button></div><div>${s.actualActivities.length ? s.actualActivities.map((a, i) => activityEditor(p, a, i, s)).join("") : '<p class="muted">No actual activity recorded yet.</p>'}</div><div class="actions"><button id="saveSession" class="primary" type="button">Save day</button><button id="copyPlan" class="secondary" type="button">Add planned activity now</button></div><div id="sessionMessage" class="status" role="status" aria-live="polite"></div>`;
+  document.querySelectorAll(".removeActivity").forEach(b => b.addEventListener("click", async () => {
+    collectActivities();
+    const row = b.closest(".activity"), idx = Number(row.dataset.index), removed = s.actualActivities[idx];
+    const ok = await askConfirm("Remove activity?", "This removes the logged activity entry. You can undo for a few seconds right after removing it.");
+    if (!ok) return;
+    s.actualActivities.splice(idx, 1);
+    saveState(); renderSession(); renderNutrition(); renderCharts(); renderActivityMix(); renderMetrics();
+    showToast("Activity removed.", { actionLabel: "Undo", onAction: () => { s.actualActivities.splice(idx, 0, removed); saveState(); renderAll(); } });
+  }));
+  $("addActivity").addEventListener("click", () => { collectActivities(); s.actualActivities.push({ type: "Run", intensity: "Moderate", duration: "", distance: "", avgHr: "", maxHr: "", rpe: "", notes: "", source: "manual" }); saveState(); renderSession(); });
+  $("copyPlan").addEventListener("click", () => {
+    collectActivities();
+    s.actualActivities.push({ type: activityTypes.includes(s.discipline) ? s.discipline : "Other", intensity: plannedIntensity(s), duration: s.plannedMinutes, distance: "", avgHr: "", maxHr: "", rpe: "", notes: `Completed planned session: ${s.title}`, source: "planned-auto" });
+    saveState(); renderAll();
+  });
+  $("saveSession").addEventListener("click", () => {
+    const adjusted = collectActivities();
+    s.status = $("statusInput").value;
+    s.dayNotes = $("dayNotesInput").value;
+    if (["Planned", "Skipped"].includes(s.status)) s.actualActivities = s.actualActivities.filter(a => a.source !== "planned-auto");
+    addPlannedIfCompleted(s);
+    saveState(); renderAll();
+    $("sessionMessage").textContent = adjusted ? "Day saved. Some activity values were out of range and were adjusted." : "Day saved. Completed planned activity has been added to the record.";
+  });
+}
+
+/* ================================================================
+   UI: METRICS & NUTRITION PANELS
+   ================================================================ */
+function renderMetrics() {
+  const p = activeProfile();
+  const done = p.sessions.filter(s => completedStatus(s.status)).length;
+  const pct = Math.round(done / p.sessions.length * 100);
+  const acts = p.sessions.flatMap(s => s.actualActivities);
+  const mins = acts.reduce((n, a) => n + (Number(a.duration) || 0), 0);
+  const latest = [...p.checkins].filter(c => c.weight).sort((a, b) => a.date.localeCompare(b.date)).at(-1);
+  const weight = Number(latest?.weight || p.athlete.startWeight);
+  const days = Math.ceil((profileRaceDate(p) - new Date()) / 86400000);
+  $("completionValue").textContent = `${pct}%`;
+  $("completionDetail").textContent = `${done} of ${p.sessions.length} completed days`;
+  $("timeValue").textContent = `${(mins / 60).toFixed(1)} h`;
+  $("activityDetail").textContent = `${acts.length} activities · ${p.sessions.reduce((n, s) => n + dayCalories(p, s), 0)} kcal`;
+  $("weightValue").textContent = `${weight.toFixed(1)} kg`;
+  $("weightChange").textContent = `${(weight - p.athlete.startWeight).toFixed(1)} kg from start · target ${p.athlete.goalWeight} kg`;
+  $("countdownValue").textContent = days >= 0 ? `${days} days` : "Race complete";
+}
+/* ================================================================
+   MEAL SUGGESTIONS
+   A small internal recipe library (original content, not sourced from
+   any specific site or publication) matched against the day's computed
+   calorie/protein target from nutritionFor(). Selection is deterministic
+   per day (so it doesn't change on every re-render) but varies day to
+   day, and can be re-rolled with "Shuffle suggestions". Nutrition
+   figures are estimates, consistent with the rest of the app's calorie
+   planning figures — not medical or dietetic advice.
+   ================================================================ */
+const recipeLibrary = {
+  breakfast: [
+    { name: "Greek yogurt, berries and granola", kcal: 390, protein: 28, fat: 10, carbs: 45, ingredients: ["250 g Greek yogurt", "1 cup mixed berries", "40 g granola", "1 tsp honey"], method: ["Spoon the yogurt into a bowl.", "Top with berries and granola.", "Drizzle with honey."] },
+    { name: "Three-egg veggie omelette with toast", kcal: 420, protein: 26, fat: 22, carbs: 28, ingredients: ["3 eggs", "Handful spinach", "1/4 capsicum, diced", "20 g cheese", "1 slice wholegrain toast"], method: ["Whisk the eggs and pour into a hot, lightly oiled pan.", "Scatter vegetables and cheese over one half, fold when just set.", "Serve with toast."] },
+    { name: "Oats with banana and peanut butter", kcal: 460, protein: 16, fat: 16, carbs: 62, ingredients: ["60 g rolled oats", "300 ml milk", "1 banana, sliced", "1 tbsp peanut butter", "Pinch cinnamon"], method: ["Simmer oats in milk for 4-5 minutes, stirring.", "Top with banana and peanut butter.", "Finish with cinnamon."] },
+    { name: "Smoked salmon and cream cheese bagel", kcal: 450, protein: 24, fat: 18, carbs: 48, ingredients: ["1 wholegrain bagel", "40 g cream cheese", "60 g smoked salmon", "Squeeze of lemon", "Black pepper"], method: ["Toast and split the bagel.", "Spread with cream cheese, top with salmon.", "Finish with lemon and pepper."] },
+    { name: "Protein smoothie with banana and oats", kcal: 410, protein: 34, fat: 8, carbs: 50, ingredients: ["1 scoop protein powder", "1 banana", "30 g oats", "250 ml milk", "Ice"], method: ["Add all ingredients to a blender.", "Blend until smooth.", "Add water to thin if needed."] },
+    { name: "Avocado and poached egg on rye", kcal: 430, protein: 18, fat: 24, carbs: 34, ingredients: ["2 slices rye bread", "1/2 avocado, mashed", "2 eggs", "Chilli flakes", "Lemon juice"], method: ["Toast the rye bread.", "Spread with mashed avocado and a squeeze of lemon.", "Top with poached eggs and chilli flakes."] },
+    { name: "Cottage cheese, pineapple and walnuts", kcal: 350, protein: 24, fat: 14, carbs: 30, ingredients: ["200 g cottage cheese", "1 cup pineapple pieces", "20 g walnuts", "1 tsp honey"], method: ["Spoon cottage cheese into a bowl.", "Top with pineapple and walnuts.", "Drizzle with honey."] },
+    { name: "Breakfast burrito with eggs and beans", kcal: 480, protein: 30, fat: 22, carbs: 40, ingredients: ["2 eggs, scrambled", "1 large tortilla", "1/2 cup black beans", "30 g cheese", "2 tbsp salsa"], method: ["Scramble the eggs and warm the beans.", "Fill the tortilla with eggs, beans, cheese and salsa.", "Roll and serve."] },
+    { name: "Big-batch porridge with nuts, seeds and fruit", kcal: 660, protein: 22, fat: 24, carbs: 90, ingredients: ["90 g rolled oats", "400 ml milk", "1 tbsp mixed nuts and seeds", "1 banana or handful berries", "1 tbsp maple syrup"], method: ["Simmer oats in milk for 5-6 minutes, stirring often.", "Top with nuts, seeds and fruit.", "Finish with maple syrup — a heartier bowl for a big training day."] },
+    { name: "Loaded breakfast bowl with eggs, avocado and potato", kcal: 610, protein: 30, fat: 28, carbs: 60, ingredients: ["3 eggs", "1/2 avocado", "1 cup roasted potato", "1/2 cup black beans", "Salsa"], method: ["Roast the potato until golden.", "Fry or scramble the eggs.", "Combine everything in a bowl with avocado, beans and salsa."] }
+  ],
+  lunch: [
+    { name: "Grilled chicken and quinoa salad", kcal: 510, protein: 42, fat: 16, carbs: 48, ingredients: ["150 g chicken breast", "3/4 cup cooked quinoa", "Mixed salad leaves", "Cherry tomatoes", "Olive oil and lemon dressing"], method: ["Grill the chicken until cooked through, then slice.", "Toss quinoa, leaves and tomatoes with dressing.", "Top with sliced chicken."] },
+    { name: "Tuna, white bean and rocket salad", kcal: 430, protein: 38, fat: 14, carbs: 36, ingredients: ["185 g tinned tuna, drained", "1 cup white beans", "Handful rocket", "1/4 red onion, sliced", "Olive oil and vinegar"], method: ["Combine beans, rocket and onion in a bowl.", "Flake in the tuna.", "Dress with olive oil and vinegar."] },
+    { name: "Turkey and salad wholegrain wrap", kcal: 450, protein: 32, fat: 12, carbs: 52, ingredients: ["1 large wholegrain wrap", "120 g sliced turkey breast", "Salad leaves, tomato, cucumber", "1 tbsp light mayonnaise or hummus"], method: ["Lay the wrap flat and spread with mayonnaise or hummus.", "Layer turkey and salad down the centre.", "Roll tightly and slice in half."] },
+    { name: "Lentil and vegetable soup with bread", kcal: 430, protein: 22, fat: 8, carbs: 68, ingredients: ["1 cup red lentils", "1 carrot, 1 celery stick, diced", "1 onion, diced", "Vegetable stock", "1 slice crusty bread"], method: ["Sauté the onion, carrot and celery for 5 minutes.", "Add lentils and stock, simmer 20 minutes until soft.", "Serve with bread."] },
+    { name: "Chicken and brown rice bowl", kcal: 520, protein: 40, fat: 14, carbs: 58, ingredients: ["150 g chicken breast", "3/4 cup cooked brown rice", "Steamed broccoli and carrot", "Soy sauce and sesame oil"], method: ["Grill or pan-fry the chicken, then slice.", "Steam the vegetables.", "Combine rice, vegetables and chicken, drizzle with soy and sesame oil."] },
+    { name: "Falafel and hummus flatbread", kcal: 510, protein: 20, fat: 20, carbs: 62, ingredients: ["1 flatbread", "4-5 falafel", "2 tbsp hummus", "Salad leaves and tomato", "Yoghurt drizzle"], method: ["Warm the flatbread and falafel.", "Spread with hummus.", "Fill with falafel, salad and a yoghurt drizzle."] },
+    { name: "Prawn and noodle stir-fry", kcal: 480, protein: 34, fat: 12, carbs: 60, ingredients: ["200 g prawns", "150 g noodles", "Mixed stir-fry vegetables", "Garlic and ginger", "Soy sauce"], method: ["Cook noodles according to packet, drain.", "Stir-fry garlic, ginger and vegetables, then add prawns.", "Toss through noodles and soy sauce."] },
+    { name: "Steak and sweet potato salad", kcal: 500, protein: 40, fat: 18, carbs: 44, ingredients: ["150 g lean steak", "1 medium sweet potato, roasted", "Mixed salad leaves", "Balsamic dressing"], method: ["Roast the sweet potato cubes until tender.", "Grill the steak to preference and rest, then slice.", "Toss salad leaves with sweet potato and steak, dress."] },
+    { name: "Large chicken, rice and roasted vegetable bowl", kcal: 700, protein: 50, fat: 20, carbs: 80, ingredients: ["200 g chicken breast", "1 cup cooked rice", "Roasted pumpkin, capsicum and zucchini", "Olive oil and herbs"], method: ["Roast the vegetables with olive oil and herbs.", "Grill or pan-fry the chicken, slice.", "Combine rice, vegetables and chicken in a large bowl — a bigger serve for a high-volume training day."] },
+    { name: "Big beef burrito bowl", kcal: 710, protein: 46, fat: 24, carbs: 78, ingredients: ["200 g beef mince or strips", "1 cup rice", "1/2 cup black beans", "Corn, capsicum, cheese", "Salsa and sour cream"], method: ["Brown the beef with taco seasoning.", "Warm the beans and rice.", "Layer everything in a large bowl."] }
+  ],
+  dinner: [
+    { name: "Baked salmon, broccoli and rice", kcal: 570, protein: 42, fat: 22, carbs: 50, ingredients: ["180 g salmon fillet", "3/4 cup cooked rice", "1 cup broccoli", "Lemon and dill"], method: ["Bake the salmon at 200°C for 12-15 minutes with lemon and dill.", "Steam the broccoli.", "Serve over rice."] },
+    { name: "Chicken stir-fry with vegetables and noodles", kcal: 570, protein: 44, fat: 16, carbs: 62, ingredients: ["180 g chicken thigh or breast, sliced", "150 g noodles", "Mixed stir-fry vegetables", "Soy and oyster sauce"], method: ["Cook noodles and set aside.", "Stir-fry chicken until cooked, add vegetables.", "Toss through noodles and sauces."] },
+    { name: "Beef and vegetable chilli with rice", kcal: 560, protein: 40, fat: 18, carbs: 60, ingredients: ["180 g lean beef mince", "1 tin kidney beans", "1 tin diced tomatoes", "Capsicum and onion", "3/4 cup cooked rice"], method: ["Brown the mince with onion and capsicum.", "Add tomatoes and beans, simmer 15-20 minutes.", "Serve over rice."] },
+    { name: "Grilled fish tacos with slaw", kcal: 500, protein: 34, fat: 16, carbs: 54, ingredients: ["200 g white fish fillets", "3 small tortillas", "Shredded cabbage and carrot slaw", "Lime and yoghurt dressing"], method: ["Grill or pan-fry the fish until just cooked.", "Warm the tortillas.", "Fill with fish and slaw, dress with lime yoghurt."] },
+    { name: "Roast chicken, potatoes and greens", kcal: 560, protein: 46, fat: 20, carbs: 48, ingredients: ["200 g chicken breast or thigh", "2 medium potatoes", "Green beans or broccolini", "Herbs and olive oil"], method: ["Roast potatoes and chicken with herbs and oil at 200°C for 30-35 minutes.", "Steam the greens.", "Plate together."] },
+    { name: "Turkey bolognese with wholegrain pasta", kcal: 560, protein: 40, fat: 14, carbs: 68, ingredients: ["180 g turkey mince", "1 tin diced tomatoes", "Onion, carrot, celery, diced", "150 g wholegrain pasta"], method: ["Sauté the vegetables, add turkey mince and brown.", "Add tomatoes, simmer 20 minutes.", "Serve over cooked pasta."] },
+    { name: "Pork stir-fry with brown rice", kcal: 540, protein: 38, fat: 18, carbs: 56, ingredients: ["180 g pork loin, sliced", "3/4 cup cooked brown rice", "Mixed vegetables", "Garlic, ginger, soy sauce"], method: ["Stir-fry pork until browned, remove.", "Stir-fry vegetables with garlic and ginger, return pork.", "Add soy sauce, serve over rice."] },
+    { name: "Vegetable and chickpea curry with rice", kcal: 540, protein: 22, fat: 16, carbs: 78, ingredients: ["1 tin chickpeas", "Mixed vegetables (pumpkin, spinach, capsicum)", "1 tin coconut milk", "Curry paste", "3/4 cup cooked rice"], method: ["Sauté curry paste briefly, add vegetables.", "Add chickpeas and coconut milk, simmer 15-20 minutes.", "Serve over rice."] },
+    { name: "Large baked salmon with potatoes and vegetables", kcal: 720, protein: 50, fat: 28, carbs: 66, ingredients: ["220 g salmon fillet", "2 medium potatoes", "Broccoli and green beans", "Lemon, dill and olive oil"], method: ["Roast the potatoes at 200°C for 25 minutes.", "Add the salmon to the tray for the final 12-15 minutes.", "Steam the greens and serve together — a bigger portion for a high-volume day."] },
+    { name: "Big beef stir-fry with extra rice", kcal: 730, protein: 48, fat: 22, carbs: 84, ingredients: ["220 g beef strips", "1 cup cooked rice", "Mixed stir-fry vegetables", "Garlic, ginger, soy and oyster sauce"], method: ["Stir-fry the beef in batches until browned, remove.", "Stir-fry vegetables with garlic and ginger, return beef.", "Add sauces and serve over a generous portion of rice."] }
+  ],
+  snack: [
+    { name: "Greek yogurt with honey", kcal: 170, protein: 14, fat: 4, carbs: 20, ingredients: ["150 g Greek yogurt", "1 tsp honey"], method: ["Spoon yogurt into a bowl and drizzle with honey."] },
+    { name: "Almonds and an apple", kcal: 250, protein: 6, fat: 14, carbs: 26, ingredients: ["1 apple", "20 g almonds"], method: ["Eat the apple and almonds together."] },
+    { name: "Protein shake", kcal: 140, protein: 25, fat: 2, carbs: 6, ingredients: ["1 scoop protein powder", "250 ml water or milk"], method: ["Shake or blend protein powder with water or milk."] },
+    { name: "Rice cakes with peanut butter", kcal: 240, protein: 8, fat: 12, carbs: 26, ingredients: ["2 rice cakes", "1.5 tbsp peanut butter"], method: ["Spread peanut butter over the rice cakes."] },
+    { name: "Cottage cheese and crackers", kcal: 200, protein: 16, fat: 6, carbs: 20, ingredients: ["150 g cottage cheese", "4 wholegrain crackers"], method: ["Serve cottage cheese with crackers."] },
+    { name: "Banana and a boiled egg", kcal: 200, protein: 9, fat: 6, carbs: 28, ingredients: ["1 banana", "1 boiled egg"], method: ["Boil the egg for 8-10 minutes, cool, peel and eat with the banana."] }
+  ]
+};
+// Small deterministic string hash so the same day always suggests the same meals
+// (until deliberately shuffled), without needing to persist a random pick per day.
+function seedFromString(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function mealScore(recipe, targetKcal, targetProtein) {
+  return Math.abs(recipe.kcal - targetKcal) + Math.abs(recipe.protein - targetProtein) * 3;
+}
+function pickRecipe(pool, targetKcal, targetProtein, seedKey) {
+  const scored = pool.map(r => ({ r, score: mealScore(r, targetKcal, targetProtein) })).sort((a, b) => a.score - b.score);
+  const top = scored.slice(0, Math.min(3, scored.length));
+  return top[seedFromString(seedKey) % top.length].r;
+}
+// Splits the day's target across breakfast/lunch/dinner, then tops up with snacks
+// (repeating a snack option if needed) until the total is reasonably close to target —
+// important on big-volume training days where three meals alone may not reach it.
+function suggestMeals(nutrition, dateStr, seedOverride) {
+  const T = nutrition.target, P = nutrition.protein;
+  const splits = { breakfast: 0.28, lunch: 0.34, dinner: 0.38 };
+  const seedBase = `${dateStr}|${seedOverride || ""}`;
+  const breakfast = pickRecipe(recipeLibrary.breakfast, T * splits.breakfast, P * splits.breakfast, seedBase + "b");
+  const lunch = pickRecipe(recipeLibrary.lunch, T * splits.lunch, P * splits.lunch, seedBase + "l");
+  const dinner = pickRecipe(recipeLibrary.dinner, T * splits.dinner, P * splits.dinner, seedBase + "d");
+  let totalKcal = breakfast.kcal + lunch.kcal + dinner.kcal;
+  let totalProtein = breakfast.protein + lunch.protein + dinner.protein;
+  const snacks = [];
+  for (let i = 0; i < 6 && T - totalKcal > 150; i++) {
+    const remainingKcal = T - totalKcal, remainingProtein = Math.max(0, P - totalProtein);
+    const snack = pickRecipe(recipeLibrary.snack, remainingKcal, remainingProtein, seedBase + "s" + i);
+    snacks.push(snack);
+    totalKcal += snack.kcal; totalProtein += snack.protein;
+  }
+  return { breakfast, lunch, dinner, snacks, totalKcal, totalProtein, targetKcal: T, targetProtein: P };
+}
+function recipeSearchUrl(name) { return `https://www.google.com/search?q=${encodeURIComponent(name + " recipe")}`; }
+function mealCardHtml(label, recipe) {
+  if (!recipe) return "";
+  return `<div class="meal-card"><h4>${label}</h4><div class="meal-name">${escapeHtml(recipe.name)}</div><div class="meal-macros"><span>${recipe.kcal} kcal</span><span>${recipe.protein} g protein</span><span>${recipe.fat} g fat</span><span>${recipe.carbs} g carbs</span></div><details><summary>Ingredients &amp; method</summary><ul>${recipe.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul><ol>${recipe.method.map(m => `<li>${escapeHtml(m)}</li>`).join("")}</ol></details><a href="${recipeSearchUrl(recipe.name)}" target="_blank" rel="noopener">Search for variations online ↗</a></div>`;
+}
+function renderMealSuggestions(n, s) {
+  const suggestion = suggestMeals(n, s.date, s.mealSeed);
+  const snackCards = suggestion.snacks.map((snack, i) => mealCardHtml(suggestion.snacks.length > 1 ? `Snack ${i + 1}` : "Snack", snack)).join("");
+  $("mealSuggestions").innerHTML = mealCardHtml("Breakfast", suggestion.breakfast) + mealCardHtml("Lunch", suggestion.lunch) + mealCardHtml("Dinner", suggestion.dinner) + snackCards;
+  const deltaKcal = suggestion.totalKcal - suggestion.targetKcal;
+  $("mealTotals").textContent = `Suggested total: ${suggestion.totalKcal} kcal (target ${suggestion.targetKcal} kcal, ${deltaKcal >= 0 ? "+" : ""}${deltaKcal}) · ${Math.round(suggestion.totalProtein)} g protein (target ${Math.round(suggestion.targetProtein)} g).`;
+}
+
+function renderNutrition() {
+  const p = activeProfile(), s = currentSession();
+  if (!s) return;
+  const n = nutritionFor(p, s);
+  $("baselineCalories").textContent = `${n.base} kcal`;
+  $("exerciseCalories").textContent = `${n.burn} kcal`;
+  $("targetCalories").textContent = `${n.target} kcal`;
+  $("deficitCalories").textContent = `${n.deficit} kcal`;
+  $("macroSummary").innerHTML = `For <strong>${s.day}, ${shortDate.format(new Date(s.date + "T12:00:00"))}</strong>: approximately <strong>${n.protein} g protein</strong>, <strong>${n.fat} g fat</strong> and <strong>${n.carbs} g carbohydrate</strong>. Current calculation weight: ${n.w.toFixed(1)} kg.`;
+  renderMealSuggestions(n, s);
+}
+function renderActivityMix() {
+
+  const p = activeProfile();
+  const totals = {};
+  p.sessions.flatMap(s => s.actualActivities.map(a => ({ ...a, date: s.date }))).forEach(a => {
+    const k = a.type;
+    totals[k] = totals[k] || { m: 0, c: 0 };
+    totals[k].m += Number(a.duration) || 0;
+    totals[k].c += activityCalories(p, a, a.date);
+  });
+  const e = Object.entries(totals).sort((a, b) => b[1].m - a[1].m);
+  const max = Math.max(1, ...e.map(x => x[1].m));
+  $("disciplineProgress").innerHTML = e.length ? e.map(([t, v]) => `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><span>${t}</span><span>${v.m} min · ${v.c} kcal</span></div><div class="track"><div class="fill" style="width:${Math.round(v.m / max * 100)}%"></div></div></div>`).join("") : '<p class="muted">Log activities to build this view.</p>';
+}
+
+/* ================================================================
+   UI: CHECK-INS (form, save, and editable/deletable history)
+   ================================================================ */
+function saveCheckin() {
+  const p = activeProfile();
+  const date = $("checkinDate").value;
+  if (!date) { $("checkinMessage").textContent = "Select a date first."; flashInvalid($("checkinDate")); return; }
+  const weightRaw = $("weightInput").value;
+  let weightAdjusted = false, weight = weightRaw;
+  if (weightRaw !== "") {
+    const w = clampNumber(weightRaw, { min: 30, max: 250, fallback: null });
+    if (w.value === null) { $("checkinMessage").textContent = "Enter a valid weight in kilograms."; flashInvalid($("weightInput")); return; }
+    weight = String(w.value); weightAdjusted = w.adjusted;
+  }
+  const rhrRaw = $("rhrInput").value;
+  if (rhrRaw !== "" && (!Number.isFinite(Number(rhrRaw)) || Number(rhrRaw) < 25 || Number(rhrRaw) > 220)) { $("checkinMessage").textContent = "Resting heart rate should be between 25 and 220 bpm."; flashInvalid($("rhrInput")); return; }
+  const sleepRaw = $("sleepInput").value;
+  if (sleepRaw !== "" && (!Number.isFinite(Number(sleepRaw)) || Number(sleepRaw) < 0 || Number(sleepRaw) > 16)) { $("checkinMessage").textContent = "Sleep hours should be between 0 and 16."; flashInvalid($("sleepInput")); return; }
+  p.checkins = p.checkins.filter(c => c.date !== date);
+  p.checkins.push({ date, weight, rhr: rhrRaw, sleep: sleepRaw, fatigue: $("fatigueInput").value });
+  saveState();
+  $("checkinMessage").textContent = weightAdjusted ? "Check-in saved (weight adjusted to a valid 30–250 kg range)." : "Check-in saved and weight graph updated.";
+  renderAll();
+}
+function renderCheckinHistory() {
+  const p = activeProfile();
+  const rows = [...p.checkins].sort((a, b) => b.date.localeCompare(a.date));
+  $("checkinHistory").innerHTML = rows.length ? rows.map(c => {
+    const bits = [c.weight ? `${c.weight} kg` : null, c.rhr ? `RHR ${c.rhr}` : null, c.sleep ? `${c.sleep}h sleep` : null, c.fatigue ? `${c.fatigue} fatigue` : null].filter(Boolean).join(" · ");
+    return `<div class="checkin-row" data-date="${c.date}"><div><strong>${mediumDate.format(new Date(c.date + "T12:00:00"))}</strong><div class="muted small">${bits || "No details recorded"}</div></div><div class="actions"><button type="button" class="secondary editCheckin" data-date="${c.date}">Edit</button><button type="button" class="secondary danger deleteCheckin" data-date="${c.date}">Delete</button></div></div>`;
+  }).join("") : '<p class="muted small">No check-ins recorded yet.</p>';
+  document.querySelectorAll(".editCheckin").forEach(b => b.addEventListener("click", () => {
+    const c = p.checkins.find(x => x.date === b.dataset.date);
+    if (!c) return;
+    $("checkinDate").value = c.date; $("weightInput").value = c.weight || ""; $("rhrInput").value = c.rhr || ""; $("sleepInput").value = c.sleep || ""; $("fatigueInput").value = c.fatigue || "Low";
+    $("checkinMessage").textContent = `Editing the check-in for ${mediumDate.format(new Date(c.date + "T12:00:00"))}. Change values and save to update it.`;
+    $("checkinDate").scrollIntoView({ behavior: "smooth", block: "center" });
+  }));
+  document.querySelectorAll(".deleteCheckin").forEach(b => b.addEventListener("click", async () => {
+    const date = b.dataset.date, idx = p.checkins.findIndex(x => x.date === date);
+    if (idx === -1) return;
+    const removed = p.checkins[idx];
+    const ok = await askConfirm("Delete check-in?", `Remove the check-in for ${mediumDate.format(new Date(date + "T12:00:00"))}? This affects the weight graph and calorie targets.`);
+    if (!ok) return;
+    p.checkins.splice(idx, 1); saveState(); renderAll();
+    showToast("Check-in deleted.", { actionLabel: "Undo", onAction: () => { p.checkins.splice(idx, 0, removed); saveState(); renderAll(); } });
+  }));
+}
+
+/* ================================================================
+   CHARTS (hand-rolled SVG; each data point has a native tooltip)
+   ================================================================ */
+function weeklyData(p) {
+  const weeks = p.raceSetup.totalWeeksClamped;
+  return Array.from({ length: weeks }, (_, i) => {
+    const w = i + 1, ss = p.sessions.filter(s => s.week === w);
+    return { week: w, planned: ss.reduce((n, s) => n + s.plannedMinutes, 0), actual: ss.reduce((n, s) => n + totalMinutes(s), 0), completion: ss.length ? Math.round(ss.filter(s => completedStatus(s.status)).length / ss.length * 100) : 0 };
+  });
+}
+function barChart(data) {
+  const W = 720, H = 270, L = 42, R = 12, T = 16, B = 35, IW = W - L - R, IH = H - T - B;
+  const max = Math.max(60, ...data.flatMap(d => [d.planned, d.actual])), g = IW / data.length, b = Math.max(6, g * .28), y = v => T + IH - v / max * IH;
+  const grid = [0, .25, .5, .75, 1].map(f => { const v = Math.round(max * f), py = y(v); return `<line class="chart-grid" x1="${L}" y1="${py}" x2="${W - R}" y2="${py}"/><text class="chart-label" x="${L - 6}" y="${py + 4}" text-anchor="end">${v}</text>`; }).join("");
+  const bars = data.map((d, i) => { const c = L + g * i + g / 2; return `<g><title>Week ${d.week}: planned ${d.planned} min, actual ${d.actual} min</title><rect class="planned-bar" x="${c - b - 1}" y="${y(d.planned)}" width="${b}" height="${T + IH - y(d.planned)}" rx="3"/><rect class="actual-bar" x="${c + 1}" y="${y(d.actual)}" width="${b}" height="${T + IH - y(d.actual)}" rx="3"/></g><text class="chart-label" x="${c}" y="${H - 12}" text-anchor="middle">${d.week}</text>`; }).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly training minutes, planned versus actual">${grid}${bars}</svg>`;
+}
+function lineChart(data) {
+  const W = 720, H = 270, L = 42, R = 12, T = 20, B = 35, IW = W - L - R, IH = H - T - B, x = i => L + IW / Math.max(1, data.length - 1) * i, y = v => T + IH - v / 100 * IH;
+  const grid = [0, 25, 50, 75, 100].map(v => `<line class="chart-grid" x1="${L}" y1="${y(v)}" x2="${W - R}" y2="${y(v)}"/><text class="chart-label" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`).join("");
+  const pts = data.map((d, i) => `${x(i)},${y(d.completion)}`).join(" ");
+  const dots = data.map((d, i) => `<circle class="dot" cx="${x(i)}" cy="${y(d.completion)}" r="4"><title>Week ${d.week}: ${d.completion}% completed</title></circle><text class="chart-label" x="${x(i)}" y="${H - 12}" text-anchor="middle">${d.week}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly completion percentage">${grid}<polyline class="line" points="${pts}"/>${dots}</svg>`;
+}
+function weightChart(p) {
+  const checks = [...p.checkins].filter(c => c.weight).sort((a, b) => a.date.localeCompare(b.date));
+  if (!checks.length) return '<div class="callout">Save weight check-ins to build this graph.</div>';
+  const W = 720, H = 270, L = 45, R = 18, T = 20, B = 35;
+  const start = profileWeekStart(p, 1), race = profileRaceDate(p);
+  const all = [p.athlete.startWeight, p.athlete.goalWeight, ...checks.map(c => Number(c.weight))];
+  const min = Math.floor(Math.min(...all) - 1), max = Math.ceil(Math.max(...all) + 1);
+  const xDate = d => { const t = (new Date(d + "T12:00:00") - start) / (race - start); return L + Math.max(0, Math.min(1, t)) * (W - L - R); };
+  const y = v => T + (H - T - B) - (v - min) / (max - min) * (H - T - B);
+  const grid = Array.from({ length: 5 }, (_, i) => min + (max - min) * i / 4).map(v => `<line class="chart-grid" x1="${L}" y1="${y(v)}" x2="${W - R}" y2="${y(v)}"/><text class="chart-label" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v.toFixed(1)}</text>`).join("");
+  const pts = checks.map(c => `${xDate(c.date)},${y(Number(c.weight))}`).join(" ");
+  const target = `${L},${y(p.athlete.startWeight)} ${W - R},${y(p.athlete.goalWeight)}`;
+  const dots = checks.map(c => `<circle class="dot" cx="${xDate(c.date)}" cy="${y(Number(c.weight))}" r="4"><title>${mediumDate.format(new Date(c.date + "T12:00:00"))}: ${Number(c.weight).toFixed(1)} kg</title></circle>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight progress in kilograms">${grid}<polyline class="target-line" points="${target}"/><polyline class="line" points="${pts}"/>${dots}<text class="chart-label" x="${L}" y="${H - 8}">${shortDate.format(start)}</text><text class="chart-label" x="${W - R}" y="${H - 8}" text-anchor="end">${shortDate.format(race)}</text></svg>`;
+}
+function calorieChart(p) {
+  const ss = p.sessions.filter(s => s.week === p.selectedWeek);
+  const W = 720, H = 270, L = 42, R = 12, T = 20, B = 35, IW = W - L - R, IH = H - T - B;
+  const data = ss.map(s => ({ day: s.day.slice(0, 3), ...nutritionFor(p, s) }));
+  const max = Math.max(2200, ...data.map(d => d.target)), g = IW / Math.max(1, data.length), b = g * .36, y = v => T + IH - v / max * IH;
+  const grid = [0, .25, .5, .75, 1].map(f => { const v = Math.round(max * f), py = y(v); return `<line class="chart-grid" x1="${L}" y1="${py}" x2="${W - R}" y2="${py}"/><text class="chart-label" x="${L - 6}" y="${py + 4}" text-anchor="end">${v}</text>`; }).join("");
+  const bars = data.map((d, i) => { const c = L + g * i + g / 2; return `<rect class="actual-bar" x="${c - b / 2}" y="${y(d.target)}" width="${b}" height="${T + IH - y(d.target)}" rx="4"><title>${d.day}: target ${d.target} kcal, +${d.burn} kcal from exercise</title></rect><text class="chart-label" x="${c}" y="${H - 12}" text-anchor="middle">${d.day}</text><text class="chart-label" x="${c}" y="${Math.max(12, y(d.target) - 5)}" text-anchor="middle">+${d.burn}</text>`; }).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily calorie targets and exercise calories">${grid}${bars}</svg>`;
+}
+function renderCharts() {
+  const p = activeProfile(), d = weeklyData(p);
+  $("volumeChart").innerHTML = barChart(d);
+  $("completionChart").innerHTML = lineChart(d);
+  $("weightChart").innerHTML = weightChart(p);
+  $("calorieChart").innerHTML = calorieChart(p);
+}
+
+/* ================================================================
+   UI: PROFILE (quick-edit athlete assumptions card)
+   ================================================================ */
+function fillProfile() {
+  const a = activeProfile().athlete;
+  $("profileAge").value = a.age; $("profileSex").value = a.sex || "unspecified"; $("profileHeight").value = a.height;
+  $("profileStartWeight").value = a.startWeight; $("profileGoalWeight").value = a.goalWeight;
+  $("profileProtein").value = a.proteinPerKg; $("profileFat").value = a.fatPercent;
+}
+function saveProfile() {
+  const p = activeProfile(), current = p.athlete;
+  const fields = [
+    ["profileAge", "age", { min: 10, max: 100, fallback: current.age }],
+    ["profileHeight", "height", { min: 100, max: 230, fallback: current.height }],
+    ["profileStartWeight", "startWeight", { min: 30, max: 250, fallback: current.startWeight }],
+    ["profileGoalWeight", "goalWeight", { min: 30, max: 250, fallback: current.goalWeight }],
+    ["profileProtein", "proteinPerKg", { min: 0.5, max: 3, fallback: current.proteinPerKg }],
+    ["profileFat", "fatPercent", { min: 15, max: 45, fallback: current.fatPercent }]
+  ];
+  const athlete = { sex: $("profileSex").value };
+  let adjusted = false;
+  fields.forEach(([id, key, opts]) => { const r = clampNumber($(id).value, opts); athlete[key] = r.value; if (r.adjusted) { adjusted = true; flashInvalid($(id)); } });
+  p.athlete = { ...current, ...athlete };
+  saveState(); renderAll();
+  $("profileMessage").textContent = adjusted ? "Profile saved. Some values were outside the expected range and were adjusted." : "Profile assumptions saved.";
+}
+
+/* ================================================================
+   BACKUP & RESTORE (backs up all profiles at once)
+   ================================================================ */
+function renderBackupStatus() {
+  const el = $("backupStatus");
+  if (!el) return;
+  if (!app.lastBackupAt) { el.textContent = "No backup exported yet — use \u201cExport JSON backup\u201d to keep a copy of your data."; el.classList.add("warning"); return; }
+  const days = Math.floor((Date.now() - new Date(app.lastBackupAt).getTime()) / 86400000);
+  el.textContent = `Last backup exported ${days <= 0 ? "today" : days === 1 ? "1 day ago" : `${days} days ago`}.`;
+  el.classList.toggle("warning", days >= 7);
+}
+function exportBackup() {
+  app.lastBackupAt = new Date().toISOString();
+  saveState();
+  const blob = new Blob([JSON.stringify(app, null, 2)], { type: "application/json" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = `project-100-backup-${dateKey(new Date())}.json`; a.click(); URL.revokeObjectURL(url);
+  renderBackupStatus();
+  $("dataMessage").textContent = "Backup exported.";
+}
+function validateSessionsArray(sessions) {
+  if (!Array.isArray(sessions) || !sessions.length) return "missing training session data";
+  for (const s of sessions) if (typeof s.id !== "string" || typeof s.date !== "string" || !Array.isArray(s.actualActivities)) return "malformed training session data";
+  return null;
+}
+function validateProfileNumbers(athlete) {
+  const nums = ["age", "height", "startWeight", "goalWeight", "proteinPerKg", "fatPercent"];
+  for (const k of nums) if (athlete?.[k] !== undefined && !Number.isFinite(Number(athlete[k]))) return `profile field "${k}" is not a valid number`;
+  return null;
+}
+// Validates the shape of an imported backup (either the current multi-profile format,
+// or a pre-multi-profile single-plan backup) before it replaces live data.
+function validateImportedState(p) {
+  if (!p || typeof p !== "object") return "That file is not a valid backup.";
+  if (isLegacyShape(p)) {
+    const err = validateSessionsArray(p.sessions);
+    return err ? `The file has ${err}.` : null;
+  }
+  if (!p.profiles || typeof p.profiles !== "object" || !Object.keys(p.profiles).length) return "The file is missing training plan data.";
+  for (const pr of Object.values(p.profiles)) {
+    const sErr = validateSessionsArray(pr.sessions);
+    if (sErr) return `The file has ${sErr}.`;
+    if (pr.checkins !== undefined && !Array.isArray(pr.checkins)) return "Check-in data in the file is malformed.";
+    const nErr = validateProfileNumbers(pr.athlete);
+    if (nErr) return `The file has an invalid ${nErr}.`;
+  }
+  return null;
+}
+function importBackup(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    let parsed;
+    try { parsed = JSON.parse(r.result); } catch { $("dataMessage").textContent = "Could not read that file as JSON."; e.target.value = ""; return; }
+    const err = validateImportedState(parsed);
+    if (err) { $("dataMessage").textContent = `Import cancelled: ${err}`; e.target.value = ""; return; }
+    app = isLegacyShape(parsed) ? migrateLegacy(parsed) : parsed;
+    saveState();
+    renderAll();
+    $("dataMessage").textContent = "Backup restored.";
+    e.target.value = "";
+  };
+  r.readAsText(f);
+}
+async function resetData() {
+  const ok = await askConfirm("Reset all data?", "This permanently clears every training plan, check-in and profile in this browser. Export a backup first if you might need it.");
+  if (!ok) return;
+  app = defaultAppState();
+  saveState();
+  $("dataMessage").textContent = "All data reset.";
+  showEmptyState();
+}
+
+/* ================================================================
+   PROGRESS REPORT
+   ================================================================ */
+function parseDistanceKm(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  const n = parseFloat(raw.replace(/,/g, ""));
+  if (!Number.isFinite(n)) return 0;
+  if (raw.includes("m") && !raw.includes("km")) return n / 1000;
+  return n;
+}
+function reportData(p) {
+  const requested = $("reportDate").value || dateKey(new Date());
+  const planStart = dateKey(profileWeekStart(p, 1)), raceEnd = dateKey(profileRaceDate(p));
+  const end = requested < planStart ? planStart : requested > raceEnd ? raceEnd : requested;
+  const elapsed = p.sessions.filter(s => s.date <= end);
+  const done = elapsed.filter(s => completedStatus(s.status)).length;
+  const activities = elapsed.flatMap(s => s.actualActivities.map(a => ({ ...a, date: s.date, sessionTitle: s.title })));
+  const minutes = activities.reduce((n, a) => n + (Number(a.duration) || 0), 0);
+  const calories = activities.reduce((n, a) => n + activityCalories(p, a, a.date), 0);
+  const mix = {}, distances = {};
+  activities.forEach(a => { mix[a.type] = (mix[a.type] || 0) + (Number(a.duration) || 0); distances[a.type] = (distances[a.type] || 0) + parseDistanceKm(a.distance); });
+  const checks = p.checkins.filter(c => c.weight && c.date <= end).sort((a, b) => a.date.localeCompare(b.date));
+  const currentWeight = Number(checks.at(-1)?.weight || p.athlete.startWeight);
+  const weightChange = currentWeight - Number(p.athlete.startWeight);
+  const totalWeeks = p.raceSetup.totalWeeksClamped;
+  const weeks = Math.max(1, Math.ceil((new Date(end + "T12:00:00") - profileWeekStart(p, 1) + 86400000) / (7 * 86400000)));
+  const completion = elapsed.length ? Math.round(done / elapsed.length * 100) : 0;
+  const reportWeek = Math.max(1, Math.min(totalWeeks, Math.floor((new Date(end + "T12:00:00") - profileWeekStart(p, 1)) / (7 * 86400000)) + 1));
+  const recentStart = dateKey(profileWeekStart(p, reportWeek));
+  const recent = elapsed.filter(s => s.date >= recentStart);
+  const recentActivities = recent.flatMap(s => s.actualActivities.map(a => ({ ...a, date: s.date })));
+  const recentDone = recent.filter(s => completedStatus(s.status)).length;
+  const recentMinutes = recentActivities.reduce((n, a) => n + (Number(a.duration) || 0), 0);
+  const recentCalories = recentActivities.reduce((n, a) => n + activityCalories(p, a, a.date), 0);
+  const activeTypes = Object.keys(mix).filter(k => mix[k] > 0);
+  const weightGoalTotal = Math.max(.1, Number(p.athlete.startWeight) - Number(p.athlete.goalWeight));
+  const weightProgress = Math.max(0, Math.min(100, Math.round((Number(p.athlete.startWeight) - currentWeight) / weightGoalTotal * 100)));
+  const consistency = Math.min(100, Math.round(activities.length / Math.max(1, weeks * 4) * 100));
+  const diversity = Math.min(100, Math.round(activeTypes.filter(t => ["Swim", "Bike", "Run", "Strength"].includes(t)).length / 4 * 100));
+  const readiness = Math.max(0, Math.min(100, Math.round(completion * .55 + consistency * .20 + weightProgress * .15 + diversity * .10)));
+  const longest = activities.reduce((best, a) => (Number(a.duration) || 0) > (Number(best?.duration) || 0) ? a : best, null);
+  const raceDays = Math.max(0, Math.ceil((profileRaceDate(p) - new Date(end + "T12:00:00")) / 86400000));
+  const latestCheck = checks.at(-1) || null, previousCheck = checks.length > 1 ? checks.at(-2) : null;
+  const weeklyWeightChange = latestCheck && previousCheck ? Number(latestCheck.weight) - Number(previousCheck.weight) : null;
+  const topType = Object.entries(mix).sort((a, b) => b[1] - a[1])[0]?.[0] || "training";
+  const focus = phaseForWeek(p, Math.min(totalWeeks, reportWeek + 1));
+  return { p, end, elapsed, done, activities, minutes, calories, mix, distances, currentWeight, weightChange, weeks, completion, reportWeek, totalWeeks, recent, recentActivities, recentDone, recentMinutes, recentCalories, weightProgress, readiness, longest, raceDays, weeklyWeightChange, topType, focus };
+}
+function heroStats(d) {
+  return [
+    { label: "Plan complete", shortLabel: "PLAN", value: `${d.completion}%` },
+    { label: "Training", shortLabel: "TRAINING", value: `${(d.minutes / 60).toFixed(1)}h` },
+    { label: "Activities", shortLabel: "ACTIVITIES", value: `${d.activities.length}` },
+    { label: "Exercise kcal", shortLabel: "KCAL", value: d.calories.toLocaleString("en-AU") }
+  ];
+}
+function formatDistance(type, km) {
+  if (!km) return "—";
+  if (type === "Swim") return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(2)} km`;
+  return `${km.toFixed(km >= 10 ? 0 : 1)} km`;
+}
+function coachComment(d) {
+  const lines = [];
+  if (d.completion >= 85) lines.push("Excellent consistency — you are completing the large majority of the plan.");
+  else if (d.completion >= 65) lines.push("Solid progress. The biggest gain now will come from turning partial weeks into consistent ones.");
+  else lines.push("There is still plenty of opportunity. Focus on completing the key sessions rather than trying to make up everything at once.");
+  if (d.weightChange < -.2) lines.push(`Weight is moving steadily toward the target, down ${Math.abs(d.weightChange).toFixed(1)} kg from the start.`);
+  else if (d.weightChange > .3) lines.push("Weight is currently above the starting point, so recovery, portions and everyday movement deserve attention.");
+  else lines.push("Weight is broadly stable, which is useful while the training load builds.");
+  if ((d.mix.Swim || 0) < Math.max(d.mix.Bike || 0, d.mix.Run || 0) * .25) lines.push("Swim frequency is the clearest opportunity for the next block.");
+  else if ((d.mix.Bike || 0) < (d.mix.Run || 0)) lines.push("Keep building bike volume; it offers the biggest time-saving opportunity relative to race time.");
+  else lines.push(`Your strongest volume base is currently ${d.topType.toLowerCase()}.`);
+  lines.push(`Next focus: ${d.focus}.`);
+  return lines.join(" ");
+}
+function standoutText(d) {
+  if (!d.longest) return "Log an activity to unlock your first standout achievement.";
+  const mins = Number(d.longest.duration) || 0;
+  const dist = d.longest.distance ? ` covering ${escapeHtml(d.longest.distance)}` : "";
+  return `${escapeHtml(d.longest.type)} — ${mins} minutes${dist} on ${mediumDate.format(new Date(d.longest.date + "T12:00:00"))}.`;
+}
+function reportPlainText(d) {
+  const p = d.p;
+  const top = Object.entries(d.mix).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, v]) => `${k}: ${v} min`).join(" · ") || "No activities logged";
+  return `${$("reportTitle").value || "Project <100 Progress Update"}
+${mediumDate.format(profileWeekStart(p, 1))} to ${mediumDate.format(new Date(d.end + "T12:00:00"))}
+
+RACE READINESS: ${d.readiness}/100
+Plan completion: ${d.completion}% (${d.done}/${d.elapsed.length} elapsed scheduled days)
+Training logged: ${(d.minutes / 60).toFixed(1)} hours across ${d.activities.length} activities
+Estimated exercise energy: ${d.calories.toLocaleString("en-AU")} kcal
+Current weight: ${d.currentWeight.toFixed(1)} kg (${d.weightChange <= 0 ? "" : "+"}${d.weightChange.toFixed(1)} kg from start)
+Weight-goal progress: ${d.weightProgress}%
+Current week: ${d.recentDone}/${d.recent.length} sessions · ${(d.recentMinutes / 60).toFixed(1)} hours
+Activity mix: ${top}
+Days to race: ${d.raceDays}
+
+COACH'S COMMENT
+${coachComment(d)}
+
+STANDOUT ACHIEVEMENT
+${d.longest ? `${d.longest.type}: ${d.longest.duration} minutes${d.longest.distance ? ` · ${d.longest.distance}` : ""}` : "No activities logged yet."}
+
+${p.raceSetup.raceName} · ${longDate.format(profileRaceDate(p))}
+Calorie figures are approximate planning estimates. Training plan structure is a rules-based estimate, not a certified coaching program.`;
+}
+function reportMarkup(d) {
+  const p = d.p, title = escapeHtml($("reportTitle").value || "Project <100 Progress Update");
+  const top = Object.entries(d.mix).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const max = Math.max(1, ...top.map(x => x[1]));
+  const core = ["Swim", "Bike", "Run"].map(type => ({ type, minutes: d.mix[type] || 0, distance: d.distances[type] || 0 }));
+  const stats = heroStats(d);
+  return `<div class="report-shell" id="generatedReport">
+    <div class="report-top">
+      <div class="report-kicker">${escapeHtml(p.raceSetup.raceName)}</div>
+      <div class="report-hero-row">
+        <div class="report-score" style="--score:${d.readiness}%"><div class="report-score-inner"><div><b>${d.readiness}</b><span>Race readiness</span></div></div></div>
+        <div><h2>${title}</h2><div>${mediumDate.format(profileWeekStart(p, 1))} – ${mediumDate.format(new Date(d.end + "T12:00:00"))}</div><p style="margin-bottom:0">${d.raceDays} days to race day · Week ${d.reportWeek} of ${d.totalWeeks}</p></div>
+      </div>
+    </div>
+    <div class="report-grid">${stats.map(x => `<div class="report-stat"><b>${x.value}</b><span>${x.label}</span></div>`).join("")}</div>
+    <div class="report-body">
+      <div class="report-mini-grid">${core.map(x => `<div class="report-mini"><span class="muted">${x.type}</span><b>${Math.round(x.minutes)} min</b><span class="small muted">${formatDistance(x.type, x.distance)}</span></div>`).join("")}</div>
+      <div class="report-section"><h3>This week</h3><p><strong>${d.recentDone} of ${d.recent.length}</strong> scheduled sessions completed · <strong>${(d.recentMinutes / 60).toFixed(1)} hours</strong> logged · <strong>${d.recentCalories.toLocaleString("en-AU")} kcal</strong> estimated.</p></div>
+      <div class="report-section"><h3>Progress to goal</h3>
+        <div class="report-bar-head"><span>Weight: ${p.athlete.startWeight} kg → ${d.currentWeight.toFixed(1)} kg</span><strong>${d.weightProgress}%</strong></div>
+        <div class="report-bar-track"><div class="report-bar-fill" style="width:${d.weightProgress}%"></div></div>
+        <p class="small muted">${d.weightChange <= 0 ? Math.abs(d.weightChange).toFixed(1) + " kg lost" : d.weightChange.toFixed(1) + " kg above start"} · Goal ${p.athlete.goalWeight} kg</p>
+      </div>
+      <div class="report-section"><h3>Training mix</h3><div class="report-bars">${top.length ? top.map(([k, v]) => `<div><div class="report-bar-head"><span>${escapeHtml(k)}</span><strong>${v} min</strong></div><div class="report-bar-track"><div class="report-bar-fill" style="width:${Math.round(v / max * 100)}%"></div></div></div>`).join("") : "<p>No activities logged yet.</p>"}</div></div>
+      <div class="report-highlight"><strong>🏆 Standout achievement</strong><div>${standoutText(d)}</div></div>
+      <div class="report-coach"><strong>Coach's comment</strong><p style="margin-bottom:0">${escapeHtml(coachComment(d))}</p></div>
+    </div>
+    <div class="report-footer">Race day: ${longDate.format(profileRaceDate(p))} · Energy estimates are approximate · Generated by Project &lt;100</div>
+  </div>`;
+}
+function emailReportHtml(d) {
+  const p = d.p, title = escapeHtml($("reportTitle").value || "Project <100 Progress Update");
+  const top = Object.entries(d.mix).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const max = Math.max(1, ...top.map(x => x[1]));
+  const stats = heroStats(d);
+  const metric = (value, label) => `<td width="25%" valign="top" style="padding:16px 8px;text-align:center;background:#173743;border-right:1px solid #35515a"><div style="font-size:25px;font-weight:700;color:#ffffff">${value}</div><div style="font-size:11px;color:#c9dadd;text-transform:uppercase;letter-spacing:.06em">${label}</div></td>`;
+  const bars = top.length ? top.map(([k, v]) => `<tr><td style="padding:7px 0;font-size:13px;color:#172126">${escapeHtml(k)}</td><td align="right" style="padding:7px 0;font-size:13px;font-weight:700;color:#172126">${v} min</td></tr><tr><td colspan="2" style="padding:0 0 8px"><div style="height:9px;background:#dbeaed;border-radius:8px"><div style="width:${Math.round(v / max * 100)}%;height:9px;background:#126e82;border-radius:8px"></div></div></td></tr>`).join("") : `<tr><td>No activities logged yet.</td></tr>`;
+  const core = ["Swim", "Bike", "Run"].map(type => `<td width="33%" valign="top" style="padding:10px"><div style="border:1px solid #d8e0e4;border-radius:12px;padding:12px;background:#ffffff"><div style="font-size:12px;color:#627078">${type}</div><div style="font-size:20px;font-weight:700;color:#172126">${Math.round(d.mix[type] || 0)} min</div><div style="font-size:12px;color:#627078">${formatDistance(type, d.distances[type] || 0)}</div></div></td>`).join("");
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+  <body style="margin:0;padding:0;background:#eef4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eef4f5"><tr><td align="center" style="padding:24px 10px">
+  <table role="presentation" width="700" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:700px;background:#ffffff;border-radius:22px;overflow:hidden">
+    <tr><td style="padding:25px;background:#126e82;color:#ffffff">
+      <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#d8f0f3">${escapeHtml(p.raceSetup.raceName)}</div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
+        <td width="125" valign="middle" style="padding-top:14px"><div style="width:105px;height:105px;border:10px solid #64d6c6;border-radius:60px;background:#173743;text-align:center;color:#ffffff"><div style="font-size:31px;font-weight:700;padding-top:22px">${d.readiness}</div><div style="font-size:9px;text-transform:uppercase">readiness</div></div></td>
+        <td valign="middle" style="padding-top:14px"><div style="font-size:30px;font-weight:700;line-height:1.15">${title}</div><div style="font-size:14px;margin-top:7px">${mediumDate.format(profileWeekStart(p, 1))} – ${mediumDate.format(new Date(d.end + "T12:00:00"))}</div><div style="font-size:14px;margin-top:7px">${d.raceDays} days to race day · Week ${d.reportWeek} of ${d.totalWeeks}</div></td>
+      </tr></table>
+    </td></tr>
+    <tr><td><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>${stats.map(x => metric(x.value, x.label)).join("")}</tr></table></td></tr>
+    <tr><td style="padding:22px;background:#f7fbfc;color:#172126">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>${core}</tr></table>
+      <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#126e82;font-weight:700;margin-top:18px">This week</div>
+      <p style="font-size:15px;line-height:1.5;margin:7px 0 15px"><strong>${d.recentDone} of ${d.recent.length}</strong> scheduled sessions · <strong>${(d.recentMinutes / 60).toFixed(1)} hours</strong> logged · <strong>${d.recentCalories.toLocaleString("en-AU")} kcal</strong> estimated.</p>
+      <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#126e82;font-weight:700">Progress to goal</div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:8px"><tr><td style="font-size:14px">Weight: ${p.athlete.startWeight} kg → <strong>${d.currentWeight.toFixed(1)} kg</strong></td><td align="right" style="font-size:14px;font-weight:700">${d.weightProgress}%</td></tr><tr><td colspan="2" style="padding-top:7px"><div style="height:10px;background:#dbeaed;border-radius:8px"><div style="height:10px;width:${d.weightProgress}%;background:#2ba58f;border-radius:8px"></div></div></td></tr></table>
+      <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#126e82;font-weight:700;margin-top:20px">Training mix</div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:5px">${bars}</table>
+      <div style="margin-top:18px;padding:14px;background:#e9f5f3;border-left:5px solid #2ba58f;border-radius:9px;font-size:14px;line-height:1.5"><strong>🏆 Standout achievement</strong><br>${standoutText(d)}</div>
+      <div style="margin-top:16px;padding:17px;background:#173743;color:#ffffff;border-radius:12px;font-size:14px;line-height:1.55"><strong>Coach's comment</strong><br>${escapeHtml(coachComment(d))}</div>
+    </td></tr>
+    <tr><td style="padding:14px 20px;background:#e4f2f5;color:#34515a;font-size:11px">Race day: ${longDate.format(profileRaceDate(p))} · Energy estimates are approximate · Generated by Project &lt;100</td></tr>
+  </table>
+  </td></tr></table></body></html>`;
+}
+function openReport() {
+  const p = activeProfile(), todayKey = dateKey(new Date()), planStart = dateKey(profileWeekStart(p, 1)), raceEnd = dateKey(profileRaceDate(p));
+  $("reportDate").value = todayKey > raceEnd ? raceEnd : todayKey < planStart ? planStart : todayKey;
+  $("reportModal").classList.add("open"); $("reportModal").setAttribute("aria-hidden", "false"); renderProgressReport();
+}
+function closeReport() { $("reportModal").classList.remove("open"); $("reportModal").setAttribute("aria-hidden", "true"); }
+function renderProgressReport() { const d = reportData(activeProfile()); $("reportPreview").innerHTML = reportMarkup(d); $("reportMessage").textContent = "Coaching report generated through " + mediumDate.format(new Date(d.end + "T12:00:00")) + "."; }
+async function copyReportHtml() {
+  const d = reportData(activeProfile()), html = emailReportHtml(d), text = reportPlainText(d);
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([text], { type: "text/plain" }) })]);
+      $("reportMessage").textContent = "Email-ready formatted report copied.";
+    } else { await navigator.clipboard.writeText(text); $("reportMessage").textContent = "Plain report copied."; }
+  } catch { fallbackCopy(text); $("reportMessage").textContent = "Plain report copied using the compatibility method."; }
+}
+function fallbackCopy(text) { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+async function copyWhatsApp() { const text = reportPlainText(reportData(activeProfile())); try { await navigator.clipboard.writeText(text); } catch { fallbackCopy(text); } $("reportMessage").textContent = "WhatsApp-friendly report copied."; }
+function downloadReportHtml() {
+  const d = reportData(activeProfile()), doc = emailReportHtml(d), blob = new Blob([doc], { type: "text/html" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = `project-100-email-report-${d.end}.html`; a.click(); URL.revokeObjectURL(url); $("reportMessage").textContent = "Email-ready HTML report downloaded.";
+}
+function reportSvg(d) {
+  const p = d.p, top = Object.entries(d.mix).sort((a, b) => b[1] - a[1]).slice(0, 4), max = Math.max(1, ...top.map(x => x[1])), esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const stats = heroStats(d);
+  const bars = top.map(([k, v], i) => `<text x="48" y="${450 + i * 55}" font-size="19" fill="#172126">${esc(k)}</text><text x="852" y="${450 + i * 55}" font-size="19" text-anchor="end" fill="#172126">${v} min</text><rect x="48" y="${460 + i * 55}" width="804" height="11" rx="6" fill="#dbeaed"/><rect x="48" y="${460 + i * 55}" width="${804 * v / max}" height="11" rx="6" fill="#126e82"/>`).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="780" viewBox="0 0 900 780"><rect width="900" height="780" rx="28" fill="#f7fbfc"/><rect width="900" height="205" rx="28" fill="#126e82"/><circle cx="108" cy="108" r="68" fill="#173743" stroke="#64d6c6" stroke-width="10"/><text x="108" y="112" text-anchor="middle" font-family="Arial" font-weight="700" font-size="42" fill="white">${d.readiness}</text><text x="108" y="139" text-anchor="middle" font-family="Arial" font-size="11" fill="white">READINESS</text><text x="205" y="67" font-family="Arial" font-size="16" letter-spacing="2" fill="#dff4f7">${esc(p.raceSetup.raceName.toUpperCase())}</text><text x="205" y="112" font-family="Arial" font-weight="700" font-size="37" fill="white">${esc($("reportTitle").value || "Progress Update")}</text><text x="205" y="150" font-family="Arial" font-size="19" fill="white">${d.raceDays} days to race day · Week ${d.reportWeek} of ${d.totalWeeks}</text>${stats.map((x, i) => `<text x="${112 + i * 225}" y="270" text-anchor="middle" font-family="Arial" font-weight="700" font-size="34" fill="#173743">${x.value}</text><text x="${112 + i * 225}" y="297" text-anchor="middle" font-family="Arial" font-size="13" fill="#627078">${x.shortLabel}</text>`).join("")}<text x="48" y="355" font-family="Arial" font-weight="700" font-size="24" fill="#172126">This week: ${d.recentDone}/${d.recent.length} sessions · ${(d.recentMinutes / 60).toFixed(1)} hours</text><text x="48" y="395" font-family="Arial" font-size="18" fill="#172126">Weight ${p.athlete.startWeight} kg → ${d.currentWeight.toFixed(1)} kg · ${d.weightProgress}% to goal</text>${bars}<rect x="48" y="695" width="804" height="50" rx="12" fill="#e9f5f3"/><text x="66" y="725" font-family="Arial" font-size="16" fill="#173743">🏆 ${esc(d.longest ? `${d.longest.type}: ${d.longest.duration} min` : "Log an activity to unlock an achievement")}</text><text x="48" y="765" font-family="Arial" font-size="13" fill="#627078">Race day ${esc(mediumDate.format(profileRaceDate(p)))} · Energy estimates are approximate</text></svg>`;
+}
+function downloadReportPng() {
+  const d = reportData(activeProfile()), svg = reportSvg(d), blob = new Blob([svg], { type: "image/svg+xml" }), url = URL.createObjectURL(blob), img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 900; canvas.height = 780;
+    canvas.getContext("2d").drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(png => {
+      if (!png) { $("reportMessage").textContent = "Could not create the PNG. Try downloading the HTML report instead."; return; }
+      const u = URL.createObjectURL(png), a = document.createElement("a");
+      a.href = u; a.download = `project-100-progress-${d.end}.png`; a.click(); URL.revokeObjectURL(u);
+      $("reportMessage").textContent = "PNG report downloaded.";
+    }, "image/png");
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); $("reportMessage").textContent = "Could not render the PNG report. Try downloading the HTML report instead."; };
+  img.src = url;
+}
+function emailReport() {
+  const email = $("reportEmail").value.trim(), subject = $("reportTitle").value || "Project <100 Progress Update";
+  if (!email) { $("reportMessage").textContent = "Enter the recipient email address."; flashInvalid($("reportEmail")); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $("reportMessage").textContent = "Enter a valid email address."; flashInvalid($("reportEmail")); return; }
+  const d = reportData(activeProfile()), boundary = "project_lt100_" + Date.now(), text = reportPlainText(d), html = emailReportHtml(d);
+  const eml = [`To: ${email}`, `Subject: ${subject}`, `MIME-Version: 1.0`, `Content-Type: multipart/alternative; boundary="${boundary}"`, ``, `--${boundary}`, `Content-Type: text/plain; charset="UTF-8"`, `Content-Transfer-Encoding: 8bit`, ``, text, ``, `--${boundary}`, `Content-Type: text/html; charset="UTF-8"`, `Content-Transfer-Encoding: 8bit`, ``, html, ``, `--${boundary}--`, ``].join("\r\n");
+  const blob = new Blob([eml], { type: "message/rfc822" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = `project-100-progress-email-${d.end}.eml`; a.click(); URL.revokeObjectURL(url);
+  $("reportMessage").textContent = "Complete email report created. Open the downloaded .eml file in Apple Mail, review it and press Send.";
+}
+
+/* ================================================================
+   RENDER ALL
+   ================================================================ */
+function renderAll() {
+  renderHeader();
+  renderWeekSelect();
+  renderMetrics();
+  renderCalendar();
+  renderSession();
+  renderNutrition();
+  renderActivityMix();
+  renderCharts();
+  fillProfile();
+  renderCheckinHistory();
+  renderBackupStatus();
+}
+
+/* ================================================================
+   INTERNAL TEST API
+   Exposes pure, state-independent functions for the hand-rolled test
+   harness in tests.html. Nothing here touches the DOM or localStorage.
+   ================================================================ */
+window.LT100_INTERNAL = {
+  dateKey, addDays, mondayOnOrBefore, escapeHtml,
+  clampNumber, clampOrEmpty, parseDistanceKm, formatDistance,
+  bmrFor, dailyDeficitFor, macroSplitFor, nutritionCalc,
+  distancePresets, phaseProfile, disciplineSplit, buildPhaseWeeks, weeklyTargetMinutes,
+  rotationForDayCount, sessionDistance, generatePlanForSetup, computeTotalWeeks,
+  buildLegacyPlan, legacyTemplateForWeek,
+  isLegacyShape, migrateLegacy, validateImportedState,
+  heroStats, mets,
+  normalizedPhase, inferSessionRole, swimSessionGuide, bikeSessionGuide,
+  strengthExercises, strengthSetA, strengthSetB, strengthSessionExercises, strengthIconSvg,
+  recipeLibrary, seedFromString, mealScore, pickRecipe, suggestMeals, recipeSearchUrl
+};
+
+/* ================================================================
+   START
+   Guarded so this file can also be loaded (e.g. by tests.html)
+   without the full app markup present, without throwing.
+   ================================================================ */
+if (document.getElementById("weekSelect")) initialise();
+})();
+
+</script></body></html>
